@@ -14,7 +14,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -49,8 +48,6 @@ android {
         }
     }
 }
-
-
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -69,10 +66,11 @@ dependencies {
     implementation("androidx.room:room-runtime:2.7.2")
     implementation("androidx.room:room-ktx:2.7.2")
     implementation("com.google.dagger:hilt-android:2.56.2")
+    implementation(libs.androidx.recyclerview)
     //kapt("androidx.room:room-compiler:2.7.2")
-    implementation("androidx.room:room-compiler:2.7.2")
-    implementation("com.google.dagger:hilt-android:2.48.1")
-   // kapt("com.google.dagger:hilt-compiler:2.48.1")
+    ksp("androidx.room:room-compiler:2.7.2")
+    // kapt("com.google.dagger:hilt-compiler:2.48.1")
+    ksp("com.google.dagger:hilt-compiler:2.48.1")
     implementation("com.google.dagger:hilt-compiler:2.48.1")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.airbnb.android:lottie:6.2.0")

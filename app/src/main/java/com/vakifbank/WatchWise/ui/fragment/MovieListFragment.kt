@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.vakifbank.WatchWise.databinding.FragmentHomeBinding
 
-class HomeFragment : Fragment() {
+class MovieListFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
@@ -23,7 +23,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.welcomeTextView.text = " WatchWise'a Hoş geldiniz!"
+       // binding.welcomeTextView.text = " WatchWise'a Hoş geldiniz!"
     }
 
     override fun onDestroyView() {
