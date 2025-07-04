@@ -9,8 +9,7 @@
     android:layout_marginLeft="8dp"
     android:background="@drawable/rounded_bg"
     android:padding="8dp"
-    android:gravity="center"
-    >
+    android:gravity="center">
 
     <ImageView
         android:id="@+id/filmImage"
@@ -25,8 +24,9 @@
         android:layout_height="wrap_content"
         android:text="Film Adı"
         android:textAlignment="center"
-        android:textSize="14sp"
+        android:textSize="@dimen/rows_film_title"
         android:ellipsize="end"
         android:maxLines="1"
-        android:layout_marginTop="6dp"/>
+        android:layout_marginTop="6dp"
+        android:textColor="@color/white" />
 </LinearLayout>

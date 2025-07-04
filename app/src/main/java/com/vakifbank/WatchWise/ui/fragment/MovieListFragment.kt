@@ -1,4 +1,4 @@
-package com.vakifbank.WatchWise.ise.ui.fragment
+package com.vakifbank.WatchWise.ui.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,7 +23,7 @@ class MovieListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-       // binding.welcomeTextView.text = " WatchWise'a Hoş geldiniz!"
+
     }
 
     override fun onDestroyView() {

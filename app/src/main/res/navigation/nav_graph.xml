@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/MovieListFragment"
-        android:name="com.vakifbank.WatchWise.ise.ui.fragment.MovieListFragment"
+        android:name="com.vakifbank.WatchWise.ui.fragment.MovieListFragment"
         android:label="MovieListFragment"
         tools:layout="@layout/fragment_movie_list" >
         <action
@@ -31,18 +31,6 @@
         android:name="com.vakifbank.WatchWise.ui.fragment.MovieDetailFragment"
         android:label="fragment_movie_detail"
         tools:layout="@layout/fragment_movie_detail" >
-        <argument
-            android:name="title"
-            app:argType="string" />
-        <argument
-            android:name="description"
-            app:argType="string" />
-        <argument
-            android:name="image"
-            app:argType="integer" />
-        <argument
-            android:name="rating"
-            app:argType="float" />
         <action
             android:id="@+id/action_movieDetailFragment_to_searchMovieFragment"
             app:destination="@id/searchMovieFragment" />

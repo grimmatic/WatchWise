@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:overScrollMode="never"
-            android:nestedScrollingEnabled="false"/>
+            android:nestedScrollingEnabled="false" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:orientation="horizontal"
@@ -71,7 +71,7 @@
                 android:id="@+id/mostPopularText2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/most_popular_films"
+                android:text="@string/top_rated"
                 android:textColor="@color/main_theme_color"
                 android:textSize="@dimen/list_bold_title"
                 android:textStyle="bold"
@@ -110,7 +110,7 @@
                 android:id="@+id/mostPopularText3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/most_popular_films"
+                android:text="@string/upcoming"
                 android:textColor="@color/main_theme_color"
                 android:textSize="@dimen/list_bold_title"
                 android:textStyle="bold"

@@ -3,4 +3,5 @@
     <dimen name="movie_list_height">16dp</dimen>
     <dimen name="list_bold_title">20dp</dimen>
     <dimen name="list_see_more">17dp</dimen>
+    <dimen name="rows_film_title">14dp</dimen>
 </resources>
