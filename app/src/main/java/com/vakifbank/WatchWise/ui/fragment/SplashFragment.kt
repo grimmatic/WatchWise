@@ -59,7 +59,7 @@ class SplashFragment : Fragment() {
     private fun navigateToHome() {
         Handler(Looper.getMainLooper()).postDelayed({
             if (isAdded && !isRemoving) {
-                findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+                findNavController().navigate(R.id.action_splashFragment_to_MovieListFragment)
             }
         }, splashTimeout)
     }

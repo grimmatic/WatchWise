@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">WatchWise</string>
     <string name="tagline">Hoş geldiniz</string>
+    <string name="most_popular_films">En Popüler Filmler</string>
+    <string name="top_rated">En İyi Filmler</string>
+    <string name="upcoming">Yakında Vizyonda</string>
+    <string name="see_more">Daha Fazla</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -5,5 +5,6 @@
 <color name="black">#FF000000</color>
 <color name="white_70">#B3FFFFFF</color>
 <color name="primary_purple">#667eea</color>
-<color name="primary_pink">#f093fb</color>
+    <color name="primary_pink">#f093fb</color>
+    <color name="main_theme_color">#761CB9</color>
 </resources>
