@@ -4,9 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
+//import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.domain.model.Movie
 
@@ -16,7 +17,7 @@ class MovieAdapter(
 ) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
 
 
-    private lateinit var rowType: LinearLayout
+    // private lateinit var rowType: LinearLayout
 
     class MovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val filmImage: ImageView = itemView.findViewById(R.id.filmImage)
@@ -34,7 +35,15 @@ class MovieAdapter(
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         val movie = movieList[position]
         holder.filmTitle.text = movie.title
-        holder.filmImage.setImageResource(movie.image)
+        val posterUrl = "https://image.tmdb.org/t/p/w500${movie.poster}"
+        Glide.with(holder.itemView.context)
+            .load(posterUrl)
+            .placeholder(R.drawable.ic_launcher_background)
+            .error(R.drawable.ic_launcher_background)
+            .into(holder.filmImage)
+
+
+
         holder.itemView.setOnClickListener {
             onMovieClick(movie)
         }

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.vakifbank.WatchWise.data.repository.MoviesRepository
 import com.vakifbank.WatchWise.databinding.FragmentMovieListBinding
 
 class MovieListFragment : Fragment() {
@@ -23,7 +24,7 @@ class MovieListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        MoviesRepository.getPopularMovies(1)
     }
 
     override fun onDestroyView() {
