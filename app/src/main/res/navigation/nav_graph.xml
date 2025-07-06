@@ -33,7 +33,8 @@
         tools:layout="@layout/fragment_movie_detail" >
     <argument
         android:name="movieTitle"
-        app:argType="string" />
+        app:argType="string"
+        app:nullable="true"/>
     <argument
         android:name="moviePoster"
         app:argType="string"
@@ -45,7 +46,6 @@
     <argument
         android:name="movieRating"
         app:argType="float"
-        app:nullable="true"
          />
     <argument
         android:name="movieYear"
