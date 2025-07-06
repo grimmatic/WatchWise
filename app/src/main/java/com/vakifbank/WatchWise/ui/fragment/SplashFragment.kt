@@ -14,7 +14,6 @@ import com.vakifbank.WatchWise.databinding.FragmentSplashBinding
 class SplashFragment : Fragment() {
     private lateinit var binding: FragmentSplashBinding
     private var splashTimeout: Long = 3000
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -29,11 +28,9 @@ class SplashFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         startAnimations()
         navigateToHome()
     }
-
     private fun startAnimations() {
         binding.logoImageView.alpha = 0f
         binding.logoImageView.animate()

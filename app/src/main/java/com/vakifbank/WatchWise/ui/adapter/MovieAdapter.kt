@@ -16,7 +16,6 @@ class MovieAdapter(
     private val onMovieClick: (Movie) -> Unit = {}
 ) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
 
-
     // private lateinit var rowType: LinearLayout
 
     class MovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -35,13 +34,14 @@ class MovieAdapter(
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         val movie = movieList[position]
         holder.filmTitle.text = movie.title
+
+        // Poster stringini görsel (Int)'e çevirmek için Glide kullandık
         val posterUrl = "https://image.tmdb.org/t/p/w500${movie.poster}"
         Glide.with(holder.itemView.context)
             .load(posterUrl)
             .placeholder(R.drawable.ic_launcher_background)
             .error(R.drawable.ic_launcher_background)
             .into(holder.filmImage)
-
 
 
         holder.itemView.setOnClickListener {
