@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/containerLayout"
     android:layout_width="140dp"
-    android:layout_height="wrap_content"
+    android:layout_height="220dp"
     android:orientation="vertical"
     android:layout_marginTop="25dp"
     android:layout_marginBottom="8dp"
     android:layout_marginRight="8dp"
     android:layout_marginLeft="8dp"
-    android:background="@drawable/rounded_bg"
+    android:background="@drawable/rounded_bg_popular"
     android:padding="8dp"
     android:gravity="center">
 
@@ -29,7 +30,12 @@
         android:textAlignment="center"
         android:textSize="@dimen/rows_film_title"
         android:ellipsize="end"
-        android:maxLines="1"
+        android:maxLines="2"
         android:layout_marginTop="6dp"
-        android:textColor="@color/white" />
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:shadowColor="@color/black"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="3"/>
 </LinearLayout>

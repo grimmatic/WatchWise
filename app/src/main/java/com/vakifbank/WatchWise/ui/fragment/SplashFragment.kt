@@ -31,6 +31,7 @@ class SplashFragment : Fragment() {
         startAnimations()
         navigateToHome()
     }
+
     private fun startAnimations() {
         binding.logoImageView.alpha = 0f
         binding.logoImageView.animate()

@@ -4,15 +4,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 //import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.domain.model.Movie
 
+enum class MovieListType {
+    POPULAR, TOP_RATED, UPCOMING
+}
+
 class MovieAdapter(
     private val movieList: List<Movie>,
+    private val listType: MovieListType = MovieListType.POPULAR,
     private val onMovieClick: (Movie) -> Unit = {}
 ) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
 
@@ -21,6 +29,7 @@ class MovieAdapter(
     class MovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val filmImage: ImageView = itemView.findViewById(R.id.filmImage)
         val filmTitle: TextView = itemView.findViewById(R.id.filmTitle)
+        val containerLayout: LinearLayout = itemView.findViewById(R.id.containerLayout)
 
     }
 
@@ -34,6 +43,13 @@ class MovieAdapter(
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         val movie = movieList[position]
         holder.filmTitle.text = movie.title
+
+        when (listType) {
+            MovieListType.POPULAR -> holder.containerLayout.setBackgroundResource(R.drawable.rounded_bg_popular)
+            MovieListType.TOP_RATED -> holder.containerLayout.setBackgroundResource(R.drawable.rounded_bg_top_rated)
+            MovieListType.UPCOMING -> holder.containerLayout.setBackgroundResource(R.drawable.rounded_bg_upcoming)
+        }
+
 
         // Poster stringini görsel (Int)'e çevirmek için Glide kullandık
         val posterUrl = "https://image.tmdb.org/t/p/w500${movie.poster}"

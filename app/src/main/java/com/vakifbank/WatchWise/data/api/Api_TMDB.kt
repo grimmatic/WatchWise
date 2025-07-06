@@ -12,4 +12,15 @@ interface Api_TMDB {
         ,@Query("page") page: Int
     ): retrofit2.Call<GetMoviesResponse>
 
+    @GET("movie/top_rated")
+    fun getTopRatedMovies(
+        @Query("api_key") apiKey: String = Constanst.apiConstansts.TMDB_API_KEY,
+        @Query("page") page: Int
+    ): retrofit2.Call<GetMoviesResponse>
+
+    @GET("movie/upcoming")
+    fun getUpcomingMovies(
+        @Query("api_key") apiKey: String = Constanst.apiConstansts.TMDB_API_KEY,
+        @Query("page") page: Int
+    ): retrofit2.Call<GetMoviesResponse>
 }

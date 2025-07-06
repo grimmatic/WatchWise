@@ -17,5 +17,7 @@ object MoviesRepository {
     }
 
     fun getPopularMovies(page: Int) = api.getPopularMovies(page = page)
+    fun getTopRatedMovies(page: Int) = api.getTopRatedMovies(page = page)
+    fun getUpcomingMovies(page: Int) = api.getUpcomingMovies(page = page)
 
 }
