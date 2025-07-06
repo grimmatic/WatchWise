@@ -15,6 +15,7 @@ import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.domain.model.Movie
 
 enum class MovieListType {
+                         //List tipine göre color değiştirmek için kullanıyoruz
     POPULAR, TOP_RATED, UPCOMING
 }
 

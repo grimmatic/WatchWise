@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.data.repository.MoviesRepository
@@ -161,6 +162,18 @@ class MovieListFragment : Fragment() {
     private fun onMovieClick(movie: Movie) {
         // Film detay sayfasına git
         Log.d("MovieListFragment", "Film tıklandı: ${movie.title}")
+
+        val bundle = Bundle().apply {
+            putString("movieTitle", movie.title ?: "")
+            putString("moviePoster", movie.poster)
+            putString("movieDescription", movie.description)
+            putFloat("movieRating", movie.rating ?: 0.0f)
+            putString("movieYear", movie.year)
+            putString("movieLanguage", movie.language)
+            putString("movieGenres", movie.genres)
+        }
+
+        findNavController().navigate(R.id.action_MovieListFragment_to_movieDetailFragment, bundle)
     }
 
 
