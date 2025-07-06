@@ -45,14 +45,15 @@
     <argument
         android:name="movieRating"
         app:argType="float"
-        app:defaultValue="0.0" />
+        app:nullable="true"
+         />
     <argument
         android:name="movieYear"
         app:argType="string"
         app:nullable="true"/>
-    <argument
+        <argument
             android:name="movieGenres"
-            app:argType="int[]"
+            app:argType="string"
             app:nullable="true" />
     <argument
             android:name="language"

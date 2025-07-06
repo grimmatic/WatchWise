@@ -16,6 +16,7 @@ import com.vakifbank.WatchWise.domain.model.GetMoviesResponse
 import com.vakifbank.WatchWise.domain.model.Movie
 import com.vakifbank.WatchWise.ui.adapter.MovieAdapter
 import com.vakifbank.WatchWise.ui.adapter.MovieListType
+import com.vakifbank.WatchWise.utils.GenreUtils
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -161,7 +162,6 @@ class MovieListFragment : Fragment() {
     }
     private fun onMovieClick(movie: Movie) {
         // Film detay sayfasına git
-        Log.d("MovieListFragment", "Film tıklandı: ${movie.title}")
 
         val bundle = Bundle().apply {
             putString("movieTitle", movie.title ?: "")
@@ -170,8 +170,9 @@ class MovieListFragment : Fragment() {
             putFloat("movieRating", movie.rating ?: 0.0f)
             putString("movieYear", movie.year)
             putString("movieLanguage", movie.language)
-            putString("movieGenres", movie.genres)
+            putString("movieGenres", GenreUtils.getGenreNames(movie.genres))
         }
+        Log.d("MovieListFragment", "Film bilgileri: $bundle")
 
         findNavController().navigate(R.id.action_MovieListFragment_to_movieDetailFragment, bundle)
     }
