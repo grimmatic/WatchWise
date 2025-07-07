@@ -31,33 +31,9 @@
         android:name="com.vakifbank.WatchWise.ui.fragment.MovieDetailFragment"
         android:label="fragment_movie_detail"
         tools:layout="@layout/fragment_movie_detail" >
-    <argument
-        android:name="movieTitle"
-        app:argType="string"
-        app:nullable="true"/>
-    <argument
-        android:name="moviePoster"
-        app:argType="string"
-        app:nullable="true" />
-    <argument
-        android:name="movieDescription"
-        app:argType="string"
-        app:nullable="true" />
-    <argument
-        android:name="movieRating"
-        app:argType="float"
-         />
-    <argument
-        android:name="movieYear"
-        app:argType="string"
-        app:nullable="true"/>
         <argument
-            android:name="movieGenres"
-            app:argType="string"
-            app:nullable="true" />
-    <argument
-            android:name="language"
-            app:argType="string"
+            android:name="movie_data"
+            app:argType="com.vakifbank.WatchWise.domain.model.Movie"
             app:nullable="true"/>
 
 

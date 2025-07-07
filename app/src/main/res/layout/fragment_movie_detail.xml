@@ -141,6 +141,7 @@
         android:paddingRight="30dp"
         android:text="Description"
         android:textSize="18dp"
+        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="@+id/movieTitleTextView"
         app:layout_constraintTop_toBottomOf="@+id/movieTitleTextView" />
 

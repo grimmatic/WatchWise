@@ -31,4 +31,8 @@ object GenreUtils {
             .joinToString(", ")
             .ifEmpty { "Bilinmiyor" }
     }
+    fun getGenreName(genreId: Int?): String {
+        if (genreId==null) return "Bilinmiyor"
+        return genreMap[genreId] ?: "Bilinmiyor"
+    }
 }
