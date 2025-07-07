@@ -7,10 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.vakifbank.WatchWise.R
+import com.vakifbank.WatchWise.databinding.FragmentMovieDetailBinding
 import com.vakifbank.WatchWise.domain.model.Movie
 
 class MovieDetailFragment : Fragment() {
-
+    private lateinit var binding: FragmentMovieDetailBinding
     private var movie: Movie? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,11 +26,13 @@ class MovieDetailFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_movie_detail, container, false)
+        binding=FragmentMovieDetailBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.movieTitleTextView.setText(movie?.title)
        /* val movieTitle = arguments?.getString("movieTitle") ?: ""
         val moviePoster = arguments?.getString("moviePoster") ?: ""
         val movieDescription = arguments?.getString("movieDescription") ?: ""
@@ -37,6 +40,7 @@ class MovieDetailFragment : Fragment() {
         val movieYear = arguments?.getString("movieYear") ?: ""
         val movieLanguage = arguments?.getString("movieLanguage") ?: ""
         val movieGenres = arguments?.getString("movieGenres") ?: ""*/
+
 
     }
 
