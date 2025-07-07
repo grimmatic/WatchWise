@@ -19,7 +19,6 @@
         android:scaleType="centerCrop"
         android:src="@drawable/ic_launcher_background"/>
 
-<!--        görsel rounded yapılacak-->
 
 
     <TextView

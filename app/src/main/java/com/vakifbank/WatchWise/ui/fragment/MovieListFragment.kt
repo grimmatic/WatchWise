@@ -30,6 +30,8 @@ class MovieListFragment : Fragment() {
     private lateinit var topRatedMovieAdapter: MovieAdapter
     private lateinit var upcomingMovieAdapter: MovieAdapter
 
+    private var movieDetailModel: Movie? = null
+
     private val popularMovieList = mutableListOf<Movie>()
     private val topRatedMovieList = mutableListOf<Movie>()
     private val upcomingMovieList = mutableListOf<Movie>()
@@ -104,8 +106,6 @@ class MovieListFragment : Fragment() {
                         popularMovieList.addAll(movies)
                         popularMovieAdapter.notifyDataSetChanged()
                     }
-                } else {
-                    Log.e("MovieListFragment", "Popular API cevabı başarısız: ${response.code()} - ${response.message()}")
                 }
             }
 
@@ -121,14 +121,11 @@ class MovieListFragment : Fragment() {
             override fun onResponse(call: Call<GetMoviesResponse>, response: Response<GetMoviesResponse>) {
                 if (response.isSuccessful) {
                     val moviesResponse = response.body()
-                    Log.d("MovieListFragment", "Top Rated API cevabı başarılı: ${moviesResponse?.movies?.size} film bulundu")
                     moviesResponse?.movies?.let { movies ->
                         topRatedMovieList.clear()
                         topRatedMovieList.addAll(movies)
                         topRatedMovieAdapter.notifyDataSetChanged()
                     }
-                } else {
-                    Log.e("MovieListFragment", "Top Rated API cevabı başarısız: ${response.code()} - ${response.message()}")
                 }
             }
 
@@ -144,14 +141,11 @@ class MovieListFragment : Fragment() {
             override fun onResponse(call: Call<GetMoviesResponse>, response: Response<GetMoviesResponse>) {
                 if (response.isSuccessful) {
                     val moviesResponse = response.body()
-                    Log.d("MovieListFragment", "Upcoming API cevabı başarılı: ${moviesResponse?.movies?.size} film bulundu")
                     moviesResponse?.movies?.let { movies ->
                         upcomingMovieList.clear()
                         upcomingMovieList.addAll(movies)
                         upcomingMovieAdapter.notifyDataSetChanged()
                     }
-                } else {
-                    Log.e("MovieListFragment", "Upcoming API cevabı başarısız: $response")
                 }
             }
 
@@ -164,19 +158,23 @@ class MovieListFragment : Fragment() {
         // Film detay sayfasına git
 
         val bundle = Bundle().apply {
-            putString("movieTitle", movie.title ?: "")
-            putString("moviePoster", movie.poster)
-            putString("movieDescription", movie.description)
-            putFloat("movieRating", movie.rating ?: 0.0f)
-            putString("movieYear", movie.year)
-            putString("movieLanguage", movie.language)
-            putString("movieGenres", GenreUtils.getGenreNames(movie.genres))
-        }
+            //MOVİE MODELİ OLUŞTUR.Data class içerisinden verileri çekelim
+           movieDetailModel = Movie(
+                title = movie.title,
+                poster = movie.poster,
+                id = movie.id,
+                genres = movie.genres,
+                rating = movie.rating,
+                year = movie.year,
+                language = movie.language,
+                description = movie.description
+            )
+            putParcelable("movie_data",movieDetailModel)
+               }
         Log.d("MovieListFragment", "Film bilgileri: $bundle")
 
         findNavController().navigate(R.id.action_MovieListFragment_to_movieDetailFragment, bundle)
     }
-
 
 
 

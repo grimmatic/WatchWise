@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id ("kotlin-parcelize")
+
 }
 android {
     namespace = "com.vakifbank.WatchWise"
@@ -67,6 +69,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.7.2")
     implementation("com.google.dagger:hilt-android:2.56.2")
     implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.cardview)
     //kapt("androidx.room:room-compiler:2.7.2")
     ksp("androidx.room:room-compiler:2.7.2")
     // kapt("com.google.dagger:hilt-compiler:2.48.1")
