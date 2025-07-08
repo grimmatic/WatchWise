@@ -33,4 +33,13 @@ interface Api_TMDB {
         @Query("api_key") apiKey: String = Constanst.apiConstansts.TMDB_API_KEY,
         @Query("language") language: String = "tr-TR"
     ): Call<MovieDetail>
+
+
+    @GET("search/movie")
+    fun searchMovies(
+        @Query("api_key") apiKey: String = Constanst.apiConstansts.TMDB_API_KEY,
+        @Query("query") query: String,
+        @Query("language") language: String = "tr-TR",
+        @Query("page") page: Int = 1
+    ): Call<GetMoviesResponse>
 }

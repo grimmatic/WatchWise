@@ -1,6 +1,8 @@
 package com.vakifbank.WatchWise.ui.fragment
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +19,7 @@ import com.vakifbank.WatchWise.domain.model.Movie
 import com.vakifbank.WatchWise.domain.model.MovieDetail
 import com.vakifbank.WatchWise.ui.adapter.MovieAdapter
 import com.vakifbank.WatchWise.ui.adapter.MovieListType
+import com.vakifbank.WatchWise.ui.adapter.SearchMovieAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,11 +30,14 @@ class MovieListFragment : Fragment() {
     private lateinit var popularMovieAdapter: MovieAdapter
     private lateinit var topRatedMovieAdapter: MovieAdapter
     private lateinit var upcomingMovieAdapter: MovieAdapter
-    private var movieDetailModel: Movie? = null
+    private lateinit var searchMovieAdapter: SearchMovieAdapter
 
     private val popularMovieList = mutableListOf<Movie>()
     private val topRatedMovieList = mutableListOf<Movie>()
     private val upcomingMovieList = mutableListOf<Movie>()
+    private val searchMovieList = mutableListOf<Movie>()
+
+    private var isSearchMode = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,6 +52,7 @@ class MovieListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpRecyclerViews()
         setUpTextColors()
+        setUpSearchSection()
         loadAllMovies()
     }
     private fun setUpRecyclerViews() {
@@ -75,6 +82,14 @@ class MovieListFragment : Fragment() {
             adapter = upcomingMovieAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         }
+
+        searchMovieAdapter = SearchMovieAdapter(searchMovieList) { movie ->
+            onMovieClick(movie)
+        }
+        binding.searchResultsRecyclerView.apply {
+            adapter = searchMovieAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
     }
 
     private fun setUpTextColors() {
@@ -84,12 +99,76 @@ class MovieListFragment : Fragment() {
         binding.upcomingText.setTextColor(ContextCompat.getColor(requireContext(), R.color.upcoming_orange))
     }
 
+    private fun setUpSearchSection() {
+        binding.searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val query = s.toString().trim()
+                if (query.isNotEmpty()) {
+                    if (!isSearchMode) {
+                        switchToSearchMode()
+                    }
+                    searchMovies(query)
+                } else if (isSearchMode) {
+                    switchToNormalMode()
+                }
+            }
+        })
+
+        binding.backButton.setOnClickListener {
+            clearSearchAndSwitchToNormal()
+        }
+    }
+
+    private fun switchToSearchMode() {
+        isSearchMode = true
+        binding.normalContentScrollView.visibility = View.GONE
+        binding.searchResultsLayout.visibility = View.VISIBLE
+    }
+
+    private fun switchToNormalMode() {
+        isSearchMode = false
+        binding.normalContentScrollView.visibility = View.VISIBLE
+        binding.searchResultsRecyclerView.visibility = View.GONE
+        searchMovieAdapter.clearMovies()
+    }
+    private fun clearSearchAndSwitchToNormal() {
+        binding.searchEditText.setText("")
+        binding.searchEditText.clearFocus()
+        switchToNormalMode()
+    }
+
+
+    private fun searchMovies(query: String) {
+        val call = MoviesRepository.searchMovies(query)
+        call.enqueue(object : Callback<GetMoviesResponse> {
+            override fun onResponse(call: Call<GetMoviesResponse>, response: Response<GetMoviesResponse>) {
+                if (response.isSuccessful) {
+                    val moviesResponse = response.body()
+                    moviesResponse?.movies?.let { movies ->
+                        searchMovieAdapter.updateMovies(movies)
+                    }
+                } else {
+                    Log.e("MovieListFragment", "Search API başarısız: ${response.code()}")
+                    searchMovieAdapter.clearMovies()
+                }
+            }
+
+            override fun onFailure(call: Call<GetMoviesResponse>, t: Throwable) {
+                Log.e("MovieListFragment", "Search API çağrısı başarısız: ${t.message}")
+                searchMovieAdapter.clearMovies()
+            }
+        })
+    }
+
     private fun loadAllMovies() {
         loadPopularMovies()
         loadTopRatedMovies()
         loadUpcomingMovies()
     }
-
     private fun loadPopularMovies() {
         val call = MoviesRepository.getPopularMovies(1)
         call.enqueue(object : Callback<GetMoviesResponse> {
@@ -176,7 +255,6 @@ class MovieListFragment : Fragment() {
             }
         })
     }
-
 
 
     override fun onDestroyView() {
