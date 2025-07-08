@@ -38,13 +38,14 @@
         app:layout_constraintStart_toStartOf="@+id/floatingActionButton"
         app:layout_constraintTop_toBottomOf="@+id/floatingActionButton">
 
+
         <ImageView
             android:id="@+id/posterImageView"
-            android:layout_width="235dp"
-            android:layout_height="340dp"
-            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:src="@drawable/ic_launcher_background"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop"
+            android:background="@drawable/rounded_image_background"/>
 
     </androidx.cardview.widget.CardView>
 
@@ -270,9 +271,14 @@
                 android:maxLines="10"
                 android:fontFamily="@font/lato_black"
                 android:text="Description"
-                android:scrollbars = "vertical"
+                android:scrollbars="vertical"
+                android:scrollbarStyle="outsideOverlay"
+                android:scrollbarSize="4dp"
+                android:scrollbarThumbVertical="@color/primary_purple"
+                android:fadeScrollbars="false"
                 android:textColor="@color/black"
                 android:textSize="18dp" />
+
 
 
         </LinearLayout>

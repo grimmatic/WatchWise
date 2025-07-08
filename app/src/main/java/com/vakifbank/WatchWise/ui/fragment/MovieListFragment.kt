@@ -1,12 +1,16 @@
 package com.vakifbank.WatchWise.ui.fragment
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -57,6 +61,8 @@ class MovieListFragment : Fragment() {
         setUpTextColors()
         setUpSearchSection()
         loadAllMovies()
+        showScrollHint()
+
     }
     override fun onResume() {
         super.onResume()
@@ -275,6 +281,20 @@ class MovieListFragment : Fragment() {
                 Log.e("MovieListFragment", "hata: ${t.message}")
             }
         })
+    }
+
+    private fun showScrollHint() {
+        binding.populerRecyclerView.post {
+            if (_binding == null || !isAdded) return@post
+
+            binding.populerRecyclerView.smoothScrollBy(250, 0)
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (_binding != null && isAdded) {
+                    binding.populerRecyclerView.smoothScrollBy(-250, 0)
+                }
+            }, 1000)
+        }
     }
 
     override fun onDestroyView() {
