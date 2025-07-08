@@ -77,6 +77,7 @@ dependencies {
     implementation("com.google.dagger:hilt-compiler:2.48.1")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.airbnb.android:lottie:6.2.0")
+    implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -2,6 +2,7 @@ package com.vakifbank.WatchWise.data.api
 
 import com.vakifbank.WatchWise.domain.model.GetMoviesResponse
 import com.vakifbank.WatchWise.domain.model.MovieDetail
+import com.vakifbank.WatchWise.domain.model.MovieVideosResponse
 import com.vakifbank.WatchWise.ui.activity.Constanst
 import retrofit2.Call
 import retrofit2.http.GET
@@ -42,4 +43,12 @@ interface Api_TMDB {
         @Query("language") language: String = "tr-TR",
         @Query("page") page: Int = 1
     ): Call<GetMoviesResponse>
+
+    @GET("movie/{movie_id}/videos")
+    fun getMovieVideos(
+        @Path("movie_id") movieId: Int,
+        @Query("api_key") apiKey: String = Constanst.apiConstansts.TMDB_API_KEY,
+        @Query("language") language: String = "en-US"
+    ): Call<MovieVideosResponse>
+
 }
