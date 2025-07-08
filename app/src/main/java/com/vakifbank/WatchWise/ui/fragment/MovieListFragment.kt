@@ -14,22 +14,19 @@ import com.vakifbank.WatchWise.data.repository.MoviesRepository
 import com.vakifbank.WatchWise.databinding.FragmentMovieListBinding
 import com.vakifbank.WatchWise.domain.model.GetMoviesResponse
 import com.vakifbank.WatchWise.domain.model.Movie
+import com.vakifbank.WatchWise.domain.model.MovieDetail
 import com.vakifbank.WatchWise.ui.adapter.MovieAdapter
 import com.vakifbank.WatchWise.ui.adapter.MovieListType
-import com.vakifbank.WatchWise.utils.GenreUtils
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
 class MovieListFragment : Fragment() {
 
     private var _binding: FragmentMovieListBinding? = null
     private val binding get() = _binding!!
-
     private lateinit var popularMovieAdapter: MovieAdapter
     private lateinit var topRatedMovieAdapter: MovieAdapter
     private lateinit var upcomingMovieAdapter: MovieAdapter
-
     private var movieDetailModel: Movie? = null
 
     private val popularMovieList = mutableListOf<Movie>()
@@ -47,7 +44,6 @@ class MovieListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //MoviesRepository.getPopularMovies(1)
         setUpRecyclerViews()
         setUpTextColors()
         loadAllMovies()
@@ -155,25 +151,31 @@ class MovieListFragment : Fragment() {
         })
     }
     private fun onMovieClick(movie: Movie) {
-        // Film detay sayfasına git
+        navigate(movie.id ?: -1)
+    }
 
-        val bundle = Bundle().apply {
-            //MOVİE MODELİ OLUŞTUR.Data class içerisinden verileri çekelim
-           movieDetailModel = Movie(
-                title = movie.title,
-                poster = movie.poster,
-                id = movie.id,
-                genres = movie.genres,
-                rating = movie.rating,
-                year = movie.year,
-                language = movie.language,
-                description = movie.description
-            )
-            putParcelable("movie_data",movieDetailModel)
-               }
-        Log.d("MovieListFragment", "Film bilgileri: $bundle")
+    private fun navigate(movieId: Int) {
+        if (movieId == -1) {
+            return
+        }
 
-        findNavController().navigate(R.id.action_MovieListFragment_to_movieDetailFragment, bundle)
+        val call = MoviesRepository.getMovieDetails(movieId)
+        call.enqueue(object : Callback<MovieDetail> {
+            override fun onResponse(call: Call<MovieDetail>, response: Response<MovieDetail>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { movieDetail ->
+                        val bundle = Bundle().apply {
+                            putParcelable("movie_detail_data", movieDetail)
+                        }
+                        findNavController().navigate(R.id.action_MovieListFragment_to_movieDetailFragment, bundle)
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<MovieDetail>, t: Throwable) {
+                Log.e("MovieListFragment", "hata: ${t.message}")
+            }
+        })
     }
 
 

@@ -5,7 +5,7 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/MovieListFragment">
 
-   <fragment
+    <fragment
         android:id="@+id/splashFragment"
         android:name="com.vakifbank.WatchWise.ui.fragment.SplashFragment"
         android:label="SplashFragment"
@@ -26,18 +26,16 @@
             android:id="@+id/action_MovieListFragment_to_movieDetailFragment"
             app:destination="@id/movieDetailFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/movieDetailFragment"
         android:name="com.vakifbank.WatchWise.ui.fragment.MovieDetailFragment"
         android:label="fragment_movie_detail"
         tools:layout="@layout/fragment_movie_detail" >
         <argument
-            android:name="movie_data"
-            app:argType="com.vakifbank.WatchWise.domain.model.Movie"
+            android:name="movie_detail_data"
+            app:argType="com.vakifbank.WatchWise.domain.model.MovieDetail"
             app:nullable="true"/>
-
-
-
     </fragment>
 
 </navigation>

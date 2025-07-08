@@ -7,11 +7,10 @@
     android:background="@drawable/list_gradient_backgorund"
     tools:context=".ui.fragment.MovieDetailFragment">
 
-
     <LinearLayout
         android:id="@+id/linearLayout3"
-        android:layout_width="90dp"
-        android:layout_height="90dp"
+        android:layout_width="95dp"
+        android:layout_height="95dp"
         android:background="@drawable/rounded_bg_detail_cardview"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="@+id/posterImageView"
@@ -20,15 +19,13 @@
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="90dp"
-        android:layout_height="90dp"
+        android:layout_width="95dp"
+        android:layout_height="95dp"
         android:background="@drawable/rounded_bg_detail_cardview"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/posterImageView"
-        app:layout_constraintTop_toTopOf="@+id/posterImageView">
-
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="@+id/posterImageView"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
@@ -41,7 +38,6 @@
         android:src="@android:drawable/ic_menu_revert"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
     <ImageView
         android:id="@+id/posterImageView"
         android:layout_width="250dp"
@@ -51,11 +47,10 @@
         app:layout_constraintStart_toStartOf="@+id/floatingActionButton"
         app:layout_constraintTop_toBottomOf="@+id/floatingActionButton" />
 
-
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="90dp"
-        android:layout_height="90dp"
+        android:layout_width="95dp"
+        android:layout_height="95dp"
         android:background="@drawable/rounded_bg_detail_cardview"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
@@ -69,7 +64,6 @@
         android:layout_height="30dp"
         android:layout_marginTop="10dp"
         android:orientation="horizontal"
-
         app:layout_constraintStart_toStartOf="@+id/posterImageView"
         app:layout_constraintTop_toBottomOf="@+id/posterImageView">
 
@@ -77,6 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:layout_marginRight="10dp"
+            android:id="@+id/genreLinear1"
             android:background="@drawable/rounded_bg_detail_cardview"
             android:orientation="horizontal">
 
@@ -86,13 +81,17 @@
                 android:layout_height="match_parent"
                 android:text="Genre1"
                 android:textColor="@color/white"
-                android:textSize="17dp" />
+                android:textSize="@dimen/genre_size_on_detail"
+                android:paddingLeft="7dp"
+                android:paddingRight="7dp"
+                />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:layout_marginRight="10dp"
+            android:id="@+id/genreLinear2"
             android:background="@drawable/rounded_bg_detail_cardview"
             android:orientation="horizontal">
 
@@ -102,12 +101,15 @@
                 android:layout_height="match_parent"
                 android:text="Genre2"
                 android:textColor="@color/white"
-                android:textSize="17dp" />
+                android:textSize="@dimen/genre_size_on_detail"
+                android:paddingLeft="7dp"
+                android:paddingRight="7dp"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="30dp"
+            android:id="@+id/genreLinear3"
             android:background="@drawable/rounded_bg_detail_cardview"
             android:orientation="horizontal">
 
@@ -117,7 +119,9 @@
                 android:layout_height="match_parent"
                 android:text="Genre3"
                 android:textColor="@color/white"
-                android:textSize="17dp" />
+                android:textSize="@dimen/genre_size_on_detail"
+                android:paddingLeft="7dp"
+                android:paddingRight="7dp"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -126,12 +130,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Title"
+        android:text="TITLE"
         app:layout_constraintStart_toStartOf="@+id/posterImageView"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout4"
         android:textColor="@color/black"
-        android:textSize="25dp"
-        android:textStyle="bold" />
+        android:textSize="35dp"
+        android:textStyle="bold"
+        android:fontFamily="@font/bebas_neue_regular"
+        />
 
     <TextView
         android:id="@+id/movieDescriptionTextView"
@@ -140,8 +146,9 @@
         android:layout_marginTop="15dp"
         android:paddingRight="30dp"
         android:text="Description"
-        android:textSize="18dp"
+        android:textSize="20dp"
         android:textColor="@color/black"
+        android:fontFamily="@font/lato_black"
         app:layout_constraintStart_toStartOf="@+id/movieTitleTextView"
         app:layout_constraintTop_toBottomOf="@+id/movieTitleTextView" />
 
