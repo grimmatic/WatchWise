@@ -23,6 +23,7 @@ import com.vakifbank.WatchWise.ui.adapter.SearchMovieAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+
 class MovieListFragment : Fragment() {
 
     private var _binding: FragmentMovieListBinding? = null
@@ -55,8 +56,8 @@ class MovieListFragment : Fragment() {
         setUpSearchSection()
         loadAllMovies()
     }
-    private fun setUpRecyclerViews() {
 
+    private fun setUpRecyclerViews() {
         popularMovieAdapter = MovieAdapter(popularMovieList, MovieListType.POPULAR) { movie ->
             onMovieClick(movie)
         }
@@ -65,7 +66,6 @@ class MovieListFragment : Fragment() {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         }
 
-
         topRatedMovieAdapter = MovieAdapter(topRatedMovieList, MovieListType.TOP_RATED) { movie ->
             onMovieClick(movie)
         }
@@ -73,7 +73,6 @@ class MovieListFragment : Fragment() {
             adapter = topRatedMovieAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         }
-
 
         upcomingMovieAdapter = MovieAdapter(upcomingMovieList, MovieListType.UPCOMING) { movie ->
             onMovieClick(movie)
@@ -93,7 +92,6 @@ class MovieListFragment : Fragment() {
     }
 
     private fun setUpTextColors() {
-        // Text renklerini ayarla
         binding.mostPopularText.setTextColor(ContextCompat.getColor(requireContext(), R.color.popular_purple))
         binding.topRatedText.setTextColor(ContextCompat.getColor(requireContext(), R.color.top_rated_green))
         binding.upcomingText.setTextColor(ContextCompat.getColor(requireContext(), R.color.upcoming_orange))
@@ -126,21 +124,23 @@ class MovieListFragment : Fragment() {
     private fun switchToSearchMode() {
         isSearchMode = true
         binding.normalContentScrollView.visibility = View.GONE
-        binding.searchResultsLayout.visibility = View.VISIBLE
+        binding.searchResultsRecyclerView.visibility = View.VISIBLE
+        binding.backButton.visibility = View.VISIBLE
     }
 
     private fun switchToNormalMode() {
         isSearchMode = false
         binding.normalContentScrollView.visibility = View.VISIBLE
         binding.searchResultsRecyclerView.visibility = View.GONE
+        binding.backButton.visibility = View.GONE
         searchMovieAdapter.clearMovies()
     }
+
     private fun clearSearchAndSwitchToNormal() {
         binding.searchEditText.setText("")
         binding.searchEditText.clearFocus()
         switchToNormalMode()
     }
-
 
     private fun searchMovies(query: String) {
         val call = MoviesRepository.searchMovies(query)
@@ -169,6 +169,7 @@ class MovieListFragment : Fragment() {
         loadTopRatedMovies()
         loadUpcomingMovies()
     }
+
     private fun loadPopularMovies() {
         val call = MoviesRepository.getPopularMovies(1)
         call.enqueue(object : Callback<GetMoviesResponse> {
@@ -228,6 +229,7 @@ class MovieListFragment : Fragment() {
             }
         })
     }
+
     private fun onMovieClick(movie: Movie) {
         navigate(movie.id ?: -1)
     }
@@ -255,7 +257,6 @@ class MovieListFragment : Fragment() {
             }
         })
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
