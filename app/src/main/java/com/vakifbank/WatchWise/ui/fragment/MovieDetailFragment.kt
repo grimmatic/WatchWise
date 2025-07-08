@@ -1,17 +1,13 @@
 package com.vakifbank.WatchWise.ui.fragment
 
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.databinding.FragmentMovieDetailBinding
 import com.vakifbank.WatchWise.domain.model.MovieDetail
@@ -74,7 +70,6 @@ class MovieDetailFragment : Fragment() {
             } ?: run {
                 binding.releaseDateTextView.visibility = View.GONE
             }
-
 
             loadMoviePoster(movie.poster)
             //   loadMovieBackDrop(movie.backdrop)
