@@ -36,11 +36,48 @@ class MovieDetailFragment : Fragment() {
     }
 
     private fun setupMovieDetails() {
+
         movieDetail?.let { movie ->
-            binding.movieTitleTextView.text = movie.title ?: "Başlık bulunamadı"
-            binding.movieDescriptionTextView.text = movie.description ?: "Açıklama bulunamadı"
+
+            movie.title?.takeIf { it.isNotEmpty() }?.let { title ->
+                binding.movieTitleTextView.text = title
+                binding.movieTitleTextView.visibility = View.VISIBLE
+            } ?: run {
+                binding.movieTitleTextView.visibility = View.GONE
+            }
+
+
+            movie.description?.takeIf { it.isNotEmpty() }?.let { description ->
+                binding.movieDescriptionTextView.text = description
+                binding.movieDescriptionTextView.visibility = View.VISIBLE
+            } ?: run {
+                binding.movieDescriptionTextView.visibility = View.GONE
+            }
+
+            movie.language?.takeIf { it.isNotEmpty() }?.let { language ->
+                binding.languageTextView.text = language
+                binding.languageTextView.visibility = View.VISIBLE
+            } ?: run {
+                binding.languageTextView.visibility = View.GONE
+            }
+
+            movie.rating?.let { rating ->
+                binding.ratingTextView.text = String.format("%.1f", rating)
+                binding.ratingTextView.visibility = View.VISIBLE
+            } ?: run {
+                binding.ratingTextView.visibility = View.GONE
+            }
+
+            movie.releaseDate?.takeIf { it.isNotEmpty() }?.let { releaseDate ->
+                binding.releaseDateTextView.text = releaseDate.substringBefore("-")
+                binding.releaseDateTextView.visibility = View.VISIBLE
+            } ?: run {
+                binding.releaseDateTextView.visibility = View.GONE
+            }
+
+
             loadMoviePoster(movie.poster)
-         //   loadMovieBackDrop(movie.backdrop)
+            //   loadMovieBackDrop(movie.backdrop)
             setupGenreViews(movie.genres)
         }
     }

@@ -19,7 +19,6 @@ data class MovieDetail(
     @SerializedName("budget") val budget: Long?,
     @SerializedName("revenue") val revenue: Long?,
     @SerializedName("genres") val genres: List<Genre>?,
-    @SerializedName("production_companies") val productionCompanies: List<ProductionCompany>?
 ) : Parcelable
 
 @Parcelize
@@ -28,9 +27,3 @@ data class Genre(
     @SerializedName("name") val name: String
 ) : Parcelable
 
-@Parcelize
-data class ProductionCompany(
-    @SerializedName("id") val id: Int,
-    @SerializedName("name") val name: String,
-    @SerializedName("logo_path") val logoPath: String?
-) : Parcelable

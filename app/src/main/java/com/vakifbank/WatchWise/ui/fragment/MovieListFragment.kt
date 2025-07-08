@@ -96,7 +96,6 @@ class MovieListFragment : Fragment() {
             override fun onResponse(call: Call<GetMoviesResponse>, response: Response<GetMoviesResponse>) {
                 if (response.isSuccessful) {
                     val moviesResponse = response.body()
-                    Log.d("MovieListFragment", "Popular API cevabı başarılı: ${moviesResponse?.movies?.size} film bulundu")
                     moviesResponse?.movies?.let { movies ->
                         popularMovieList.clear()
                         popularMovieList.addAll(movies)
