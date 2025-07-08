@@ -98,6 +98,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:maxLines="1"
                     android:hint="Film ara..."
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
