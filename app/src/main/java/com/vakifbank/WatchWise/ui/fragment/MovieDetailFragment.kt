@@ -1,5 +1,6 @@
 package com.vakifbank.WatchWise.ui.fragment
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,6 +10,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.databinding.FragmentMovieDetailBinding
 import com.vakifbank.WatchWise.domain.model.MovieDetail
@@ -37,6 +40,7 @@ class MovieDetailFragment : Fragment() {
             binding.movieTitleTextView.text = movie.title ?: "Başlık bulunamadı"
             binding.movieDescriptionTextView.text = movie.description ?: "Açıklama bulunamadı"
             loadMoviePoster(movie.poster)
+         //   loadMovieBackDrop(movie.backdrop)
             setupGenreViews(movie.genres)
         }
     }
@@ -48,6 +52,21 @@ class MovieDetailFragment : Fragment() {
             .error(R.drawable.ic_launcher_background)
             .into(binding.posterImageView)
     }
+  /*  private fun loadMovieBackDrop(backdropPath: String?) {
+        val backDropUrl = "https://image.tmdb.org/t/p/w500$backdropPath"
+        Glide.with(requireContext())
+            .load(backDropUrl)
+            .placeholder(R.drawable.ic_launcher_background)
+            .error(R.drawable.ic_launcher_background)
+            .into(object : CustomTarget<Drawable>() {
+                override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                    binding.detailConstraintLayout.background = resource
+                }
+                override fun onLoadCleared(placeholder: Drawable?) {
+                    binding.detailConstraintLayout.background = placeholder
+                }
+            })
+    }*/
     private fun setupGenreViews(genres: List<com.vakifbank.WatchWise.domain.model.Genre>?) {
         binding?.run {
             val genreList = genres?.take(3) ?: emptyList()
