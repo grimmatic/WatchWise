@@ -100,8 +100,8 @@
         app:layout_constraintTop_toBottomOf="@+id/languageLayout">
 
         <ImageView
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="33dp"
+            android:layout_height="33dp"
             android:src="@android:drawable/ic_menu_recent_history"
             android:layout_marginBottom="2dp"
             app:tint="@color/white" />
@@ -270,8 +270,9 @@
                 android:maxLines="10"
                 android:fontFamily="@font/lato_black"
                 android:text="Description"
+                android:scrollbars = "vertical"
                 android:textColor="@color/black"
-                android:textSize="20dp" />
+                android:textSize="18dp" />
 
 
         </LinearLayout>

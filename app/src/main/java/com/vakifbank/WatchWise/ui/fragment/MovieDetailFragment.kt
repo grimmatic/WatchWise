@@ -32,6 +32,7 @@ class MovieDetailFragment : Fragment() {
     }
 
     private fun setupMovieDetails() {
+        binding.movieDescriptionTextView.movementMethod= android.text.method.ScrollingMovementMethod()
 
         movieDetail?.let { movie ->
 
