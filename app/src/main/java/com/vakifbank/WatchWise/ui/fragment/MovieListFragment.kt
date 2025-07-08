@@ -39,6 +39,8 @@ class MovieListFragment : Fragment() {
     private val searchMovieList = mutableListOf<Movie>()
 
     private var isSearchMode = false
+    private var lastSearchQuery = ""
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,6 +57,20 @@ class MovieListFragment : Fragment() {
         setUpTextColors()
         setUpSearchSection()
         loadAllMovies()
+    }
+    override fun onResume() {
+        super.onResume()
+        // Eğer search mode'dayken detay sayfasından dönüyorsak search durumunu geri yükle
+        if (isSearchMode && lastSearchQuery.isNotEmpty()) {
+            restoreSearchState()
+        }
+    }
+
+    private fun restoreSearchState() {
+        binding.searchEditText.setText(lastSearchQuery)
+        binding.searchEditText.setSelection(lastSearchQuery.length)
+        switchToSearchMode()
+        searchMovies(lastSearchQuery)
     }
 
     private fun setUpRecyclerViews() {
@@ -105,6 +121,8 @@ class MovieListFragment : Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 val query = s.toString().trim()
+                lastSearchQuery = query
+
                 if (query.isNotEmpty()) {
                     if (!isSearchMode) {
                         switchToSearchMode()
@@ -130,6 +148,7 @@ class MovieListFragment : Fragment() {
 
     private fun switchToNormalMode() {
         isSearchMode = false
+        lastSearchQuery = ""
         binding.normalContentScrollView.visibility = View.VISIBLE
         binding.searchResultsRecyclerView.visibility = View.GONE
         binding.backButton.visibility = View.GONE

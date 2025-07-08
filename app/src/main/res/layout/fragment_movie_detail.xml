@@ -43,7 +43,7 @@
             android:layout_height="340dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_launcher_background"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"/>
 
     </androidx.cardview.widget.CardView>
 
@@ -64,7 +64,7 @@
             android:layout_height="30dp"
             android:src="@android:drawable/ic_dialog_info"
             android:layout_marginBottom="4dp"
-            app:tint="@color/white" />
+            app:tint="@color/white"/>
 
         <TextView
             android:id="@+id/languageTextView"
