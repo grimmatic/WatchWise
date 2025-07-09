@@ -13,19 +13,22 @@ interface Api_TMDB {
     @GET("movie/popular")
     fun getPopularMovies(
         @Query("api_key") apiKey: String = Constanst.apiConstansts.TMDB_API_KEY,
-        @Query("page") page: Int
+        @Query("page") page: Int,
+        @Query("language") language: String = "tr-TR"
     ): Call<GetMoviesResponse>
 
     @GET("movie/top_rated")
     fun getTopRatedMovies(
         @Query("api_key") apiKey: String = Constanst.apiConstansts.TMDB_API_KEY,
-        @Query("page") page: Int
+        @Query("page") page: Int,
+        @Query("language") language: String = "tr-TR"
     ): Call<GetMoviesResponse>
 
     @GET("movie/upcoming")
     fun getUpcomingMovies(
         @Query("api_key") apiKey: String = Constanst.apiConstansts.TMDB_API_KEY,
-        @Query("page") page: Int
+        @Query("page") page: Int,
+        @Query("language") language: String = "tr-TR"
     ): Call<GetMoviesResponse>
 
     @GET("movie/{movie_id}")
