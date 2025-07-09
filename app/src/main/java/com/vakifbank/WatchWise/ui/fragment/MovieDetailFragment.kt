@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -97,6 +98,16 @@ class MovieDetailFragment : Fragment() {
 
     private fun setupMovieDetails() {
         binding.movieDescriptionTextView.movementMethod = android.text.method.ScrollingMovementMethod()
+
+        binding.movieDescriptionTextView.setOnTouchListener { view, event ->
+            view.parent.requestDisallowInterceptTouchEvent(true)
+            when (event.action and MotionEvent.ACTION_MASK) {
+                MotionEvent.ACTION_UP -> {
+                    view.parent.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            false
+        }
 
         movieDetail?.let { movie ->
             movie.title?.takeIf { it.isNotEmpty() }?.let { title ->

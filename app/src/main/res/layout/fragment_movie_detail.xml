@@ -7,13 +7,14 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:background="@drawable/list_gradient_backgorund"
+    android:paddingBottom="60dp"
+    android:clipToPadding="false"
     tools:context=".ui.fragment.MovieDetailFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_marginBottom="-60dp"
         android:id="@+id/detailConstraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@drawable/list_gradient_backgorund"
         tools:context=".ui.fragment.MovieDetailFragment">
 
@@ -74,8 +75,7 @@
                 android:text="TR"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                android:textStyle="bold"
-                 />
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -112,8 +112,7 @@
                 android:text="2023"
                 android:textColor="@color/white"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                />
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -149,8 +148,7 @@
                 android:text="7.7"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                android:textStyle="bold"
-            />
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -236,11 +234,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="15dp"
+            android:layout_marginBottom="20dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/linearLayout4"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout4"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -262,18 +262,18 @@
                 <TextView
                     android:id="@+id/movieDescriptionTextView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="120dp"
                     android:layout_marginTop="5dp"
-                    android:maxLines="7"
                     android:fontFamily="@font/lato_black"
                     android:text="Description"
+                    android:textColor="@color/black"
+                    android:textSize="18dp"
                     android:scrollbars="vertical"
                     android:scrollbarStyle="outsideOverlay"
                     android:scrollbarSize="4dp"
                     android:scrollbarThumbVertical="@color/primary_purple"
                     android:fadeScrollbars="false"
-                    android:textColor="@color/black"
-                    android:textSize="18dp" />
+                    android:overScrollMode="always" />
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/trailerButton"
@@ -282,9 +282,7 @@
                     android:layout_marginTop="10dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="4dp"
-                    android:clickable="true"
-
-                   >
+                    android:clickable="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -320,8 +318,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="YouTube'da aç"
                                 android:textColor="@color/white_70"
-                                android:textSize="14sp"
-                                />
+                                android:textSize="14sp" />
 
                         </LinearLayout>
 
