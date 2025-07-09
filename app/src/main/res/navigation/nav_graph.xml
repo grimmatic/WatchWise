@@ -25,6 +25,9 @@
         <action
             android:id="@+id/action_MovieListFragment_to_movieDetailFragment"
             app:destination="@id/movieDetailFragment" />
+        <action
+            android:id="@+id/action_MovieListFragment_to_seeMoreFragment"
+            app:destination="@id/seeMoreFragment" />
     </fragment>
 
     <fragment
@@ -36,6 +39,24 @@
             android:name="movie_detail_data"
             app:argType="com.vakifbank.WatchWise.domain.model.MovieDetail"
             app:nullable="true"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/seeMoreFragment"
+        android:name="com.vakifbank.WatchWise.ui.fragment.SeeMoreFragment"
+        android:label="fragment_see_more"
+        tools:layout="@layout/fragment_see_more">
+        <argument
+            android:name="category_type"
+            app:argType="string"
+            app:nullable="false"/>
+        <argument
+            android:name="category_title"
+            app:argType="string"
+            app:nullable="false"/>
+        <action
+            android:id="@+id/action_seeMoreFragment_to_movieDetailFragment"
+            app:destination="@id/movieDetailFragment"/>
     </fragment>
 
 </navigation>

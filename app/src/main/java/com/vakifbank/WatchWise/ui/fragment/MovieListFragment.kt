@@ -1,6 +1,5 @@
 package com.vakifbank.WatchWise.ui.fragment
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,7 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -44,7 +42,6 @@ class MovieListFragment : Fragment() {
 
     private var isSearchMode = false
     private var lastSearchQuery = ""
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -189,6 +186,7 @@ class MovieListFragment : Fragment() {
         })
     }
 
+
     private fun loadAllMovies() {
         loadPopularMovies()
         loadTopRatedMovies()
@@ -256,15 +254,11 @@ class MovieListFragment : Fragment() {
     }
 
     private fun onMovieClick(movie: Movie) {
-        navigate(movie.id ?: -1)
-    }
-
-    private fun navigate(movieId: Int) {
-        if (movieId == -1) {
+        if (movie.id == -1) {
             return
         }
 
-        val call = MoviesRepository.getMovieDetails(movieId)
+        val call = MoviesRepository.getMovieDetails(movie.id)
         call.enqueue(object : Callback<MovieDetail> {
             override fun onResponse(call: Call<MovieDetail>, response: Response<MovieDetail>) {
                 if (response.isSuccessful) {
@@ -282,6 +276,12 @@ class MovieListFragment : Fragment() {
             }
         })
     }
+
+      fun popularSeeMore(view : View) {
+
+          findNavController().navigate(R.id.action_MovieListFragment_to_seeMoreFragment)
+
+      }
 
     private fun showScrollHint() {
         binding.populerRecyclerView.post {
