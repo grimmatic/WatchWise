@@ -1,5 +1,6 @@
 package com.vakifbank.WatchWise.ui.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,15 +13,18 @@ import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.data.repository.MoviesRepository
 import com.vakifbank.WatchWise.databinding.FragmentMovieDetailBinding
 import com.vakifbank.WatchWise.domain.model.MovieDetail
+import com.vakifbank.WatchWise.domain.model.MovieVideosResponse
 import com.vakifbank.WatchWise.utils.parcelable
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import androidx.core.net.toUri
 
 class MovieDetailFragment : Fragment() {
     private var _binding: FragmentMovieDetailBinding? = null
     private val binding get() = _binding!!
     private var movieDetail: MovieDetail? = null
+    private var trailerKey: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,14 +37,68 @@ class MovieDetailFragment : Fragment() {
         binding.floatingActionButton.setOnClickListener {
             navigateBack()
         }
+
+        binding.trailerButton.visibility = View.GONE
+        binding.trailerButton.setOnClickListener {
+            trailerKey?.let { key ->
+                openYouTubeVideo(key)
+            }
+        }
     }
 
+    private fun openYouTubeVideo(videoKey: String) {
+        val youtubeIntent = Intent(Intent.ACTION_VIEW, "vnd.youtube:$videoKey".toUri())
+        youtubeIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        val packageManager = requireActivity().packageManager
+        val activities = packageManager.queryIntentActivities(youtubeIntent, 0)
+
+        if (activities.isNotEmpty()) {
+            startActivity(youtubeIntent)
+        } else {
+            // youtube yüklü değil tarayıcıda aç
+            val youtubeUrl = "https://www.youtube.com/watch?v=$videoKey"
+            val browserIntent = Intent(Intent.ACTION_VIEW, youtubeUrl.toUri())
+            browserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(browserIntent)
+        }
+    }
+
+    private fun loadMovieTrailer(movieId: Int?) {
+        movieId?.let { id ->
+            val call = MoviesRepository.getMovieVideos(id)
+            call.enqueue(object : Callback<MovieVideosResponse> {
+                override fun onResponse(call: Call<MovieVideosResponse>, response: Response<MovieVideosResponse>) {
+                    if (response.isSuccessful) {
+                        response.body()?.results?.let { videos ->
+                            // official trailer
+                            val trailer = videos.firstOrNull { video ->
+                                video.site?.lowercase() == "youtube" &&
+                                        video.type?.lowercase() == "trailer" &&
+                                        video.official == true
+                            } ?: videos.firstOrNull { video ->
+                                // official yoksa herhangi
+                                video.site?.lowercase() == "youtube" &&
+                                        video.type?.lowercase() == "trailer"
+                            }
+
+                            trailer?.key?.let { key ->
+                                trailerKey = key
+                                binding.trailerButton.visibility = View.VISIBLE
+                            }
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<MovieVideosResponse>, t: Throwable) {
+                }
+            })
+        }
+    }
 
     private fun setupMovieDetails() {
         binding.movieDescriptionTextView.movementMethod = android.text.method.ScrollingMovementMethod()
 
         movieDetail?.let { movie ->
-            // Title
             movie.title?.takeIf { it.isNotEmpty() }?.let { title ->
                 binding.movieTitleTextView.text = title
                 binding.movieTitleTextView.visibility = View.VISIBLE
@@ -64,6 +122,8 @@ class MovieDetailFragment : Fragment() {
             }
 
             movie.rating?.let { rating ->
+                //float bir değeri stringe çeviren bir extension?
+                //extension nedir?
                 binding.ratingTextView.text = String.format("%.1f", rating)
                 binding.ratingTextView.visibility = View.VISIBLE
             } ?: run {
@@ -76,9 +136,9 @@ class MovieDetailFragment : Fragment() {
             } ?: run {
                 binding.releaseDateTextView.visibility = View.GONE
             }
-
-            loadMoviePoster(movie.poster)
+            loadMoviePoster(posterPath = movie.poster)
             setupGenreViews(movie.genres)
+            loadMovieTrailer( movieId = movie.id)
         }
     }
 
@@ -105,6 +165,7 @@ class MovieDetailFragment : Fragment() {
             })
         }
     }
+
     private fun loadMoviePoster(posterPath: String?) {
         val posterUrl = "https://image.tmdb.org/t/p/w500$posterPath"
         Glide.with(requireContext())
@@ -115,7 +176,7 @@ class MovieDetailFragment : Fragment() {
     }
 
     private fun setupGenreViews(genres: List<com.vakifbank.WatchWise.domain.model.Genre>?) {
-        binding?.run {
+        binding.run {
             val genreList = genres?.take(3) ?: emptyList()
 
             when (genreList.size) {
@@ -152,9 +213,11 @@ class MovieDetailFragment : Fragment() {
     fun genreLayoutGone(genreLayout: LinearLayout){
         genreLayout.visibility = View.GONE
     }
+
     fun genreLayoutVisible(genreLayout: LinearLayout){
         genreLayout.visibility = View.VISIBLE
     }
+
     private fun navigateBack() {
         findNavController().navigateUp()
     }

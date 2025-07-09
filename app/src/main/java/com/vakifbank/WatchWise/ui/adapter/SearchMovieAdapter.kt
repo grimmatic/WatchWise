@@ -18,6 +18,8 @@
     ) : RecyclerView.Adapter<SearchMovieAdapter.SearchMovieViewHolder>() {
 
         class SearchMovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+            //View Binding kullanabilir miyiz?
             val moviePoster: ImageView = itemView.findViewById(R.id.searchMoviePoster)
             val movieTitle: TextView = itemView.findViewById(R.id.searchMovieTitle)
             val movieRating: TextView = itemView.findViewById(R.id.searchMovieRating)
