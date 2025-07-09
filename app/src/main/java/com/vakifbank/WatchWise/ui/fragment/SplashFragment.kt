@@ -1,22 +1,19 @@
 package com.vakifbank.WatchWise.ui.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import android.os.Handler
-import android.os.Looper
 import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.databinding.FragmentSplashBinding
 
 class SplashFragment : Fragment() {
     private lateinit var binding: FragmentSplashBinding
     private var splashTimeout: Long = 3000
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
