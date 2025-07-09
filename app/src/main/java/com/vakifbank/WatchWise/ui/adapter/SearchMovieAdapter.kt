@@ -1,77 +1,91 @@
-    package com.vakifbank.WatchWise.ui.adapter
+package com.vakifbank.WatchWise.ui.adapter
 
-    import android.content.Context
-    import android.view.LayoutInflater
-    import android.view.View
-    import android.view.ViewGroup
-    import android.widget.ImageView
-    import android.widget.TextView
-    import androidx.recyclerview.widget.RecyclerView
-    import com.bumptech.glide.Glide
-    import com.vakifbank.WatchWise.R
-    import com.vakifbank.WatchWise.domain.model.Movie
-    import kotlin.String
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.vakifbank.WatchWise.R
+import com.vakifbank.WatchWise.databinding.SearchRecyclerRowBinding
+import com.vakifbank.WatchWise.domain.model.Movie
+import com.vakifbank.WatchWise.utils.toRatingString
 
-    class SearchMovieAdapter(
-        private val movieList: MutableList<Movie>,
-        private val onMovieClick: (Movie) -> Unit = {}
-    ) : RecyclerView.Adapter<SearchMovieAdapter.SearchMovieViewHolder>() {
+class SearchMovieAdapter(
+    private val movieList: MutableList<Movie>,
+    private val onMovieClick: (Movie) -> Unit = {}
+) : RecyclerView.Adapter<SearchMovieAdapter.SearchMovieViewHolder>() {
 
-        class SearchMovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class SearchMovieViewHolder(private val binding: SearchRecyclerRowBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-            //View Binding kullanabilir miyiz?
-            val moviePoster: ImageView = itemView.findViewById(R.id.searchMoviePoster)
-            val movieTitle: TextView = itemView.findViewById(R.id.searchMovieTitle)
-            val movieRating: TextView = itemView.findViewById(R.id.searchMovieRating)
-            val movieDescription: TextView = itemView.findViewById(R.id.searchMovieDetail)
+        fun bind(movie: Movie, onMovieClick: (Movie) -> Unit) {
+            binding.searchMovieTitle.text = movie.title ?: "Bilinmeyen Film"
+            binding.searchMovieDetail.text = movie.description ?: "Açıklama bulunmuyor"
+            binding.searchMovieRating.text = movie.rating?.toRatingString()
+
+            loadMoviePoster(movie.poster)
+
+            binding.root.setOnClickListener {
+                onMovieClick(movie)
+            }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchMovieViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.search_recycler_row, parent, false)
-            return SearchMovieViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: SearchMovieViewHolder, position: Int) {
-            val movie = movieList[position]
-
-            holder.movieTitle.text = movie.title
-            holder.movieDescription.text = movie.description
-            holder.movieRating.text = String.format("%.1f", movie.rating)
-
-            val posterUrl = "https://image.tmdb.org/t/p/w500${movie.poster}"
-            Glide.with(holder.itemView.context)
+        private fun loadMoviePoster(posterPath: String?) {
+            val posterUrl = "https://image.tmdb.org/t/p/w500$posterPath"
+            Glide.with(binding.root.context)
                 .load(posterUrl)
                 .placeholder(R.drawable.ic_launcher_background)
                 .error(R.drawable.ic_launcher_background)
-                .into(holder.moviePoster)
-
-            holder.itemView.setOnClickListener {
-                onMovieClick(movie)
-            }
-
-            //son item için margin
-            val layoutParams = holder.itemView.layoutParams as ViewGroup.MarginLayoutParams
-            if (position == movieList.size - 1) {
-                layoutParams.bottomMargin = 60.dpToPx(holder.itemView.context)
-            }
-            holder.itemView.layoutParams = layoutParams
+                .centerCrop()
+                .into(binding.searchMoviePoster)
         }
-        fun Int.dpToPx(context: Context): Int {
+
+        fun setBottomMargin(isLastItem: Boolean) {
+            val layoutParams = binding.root.layoutParams as ViewGroup.MarginLayoutParams
+            if (isLastItem) {
+                layoutParams.bottomMargin = 60.dpToPx(binding.root.context)
+            } else {
+                layoutParams.bottomMargin = 0
+            }
+            binding.root.layoutParams = layoutParams
+        }
+
+        private fun Int.dpToPx(context: Context): Int {
             return (this * context.resources.displayMetrics.density).toInt()
         }
-        override fun getItemCount(): Int {
-            return movieList.size
-        }
-
-        fun updateMovies(newMovies: List<Movie>) {
-            movieList.clear()
-            movieList.addAll(newMovies)
-            notifyDataSetChanged()
-        }
-
-        fun clearMovies() {
-            movieList.clear()
-            notifyDataSetChanged()
-        }
     }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchMovieViewHolder {
+        val binding = SearchRecyclerRowBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return SearchMovieViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: SearchMovieViewHolder, position: Int) {
+        val movie = movieList[position]
+
+        holder.bind(movie, onMovieClick)
+
+        holder.setBottomMargin(position == movieList.size - 1)
+    }
+
+    override fun getItemCount(): Int = movieList.size
+
+    fun updateMovies(newMovies: List<Movie>) {
+        movieList.clear()
+        movieList.addAll(newMovies)
+        notifyDataSetChanged()
+    }
+
+    fun clearMovies() {
+        movieList.clear()
+        notifyDataSetChanged()
+    }
+
+
+}
+
+

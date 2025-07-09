@@ -20,6 +20,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import androidx.core.net.toUri
+import com.vakifbank.WatchWise.utils.toRatingString
 
 class MovieDetailFragment : Fragment() {
     private var _binding: FragmentMovieDetailBinding? = null
@@ -133,9 +134,7 @@ class MovieDetailFragment : Fragment() {
             }
 
             movie.rating?.let { rating ->
-                //float bir değeri stringe çeviren bir extension?
-                //extension nedir?
-                binding.ratingTextView.text = String.format("%.1f", rating)
+                binding.ratingTextView.text = rating.toRatingString()
                 binding.ratingTextView.visibility = View.VISIBLE
             } ?: run {
                 binding.ratingTextView.visibility = View.GONE

@@ -187,7 +187,6 @@ class MovieListFragment : Fragment() {
         })
     }
 
-
     private fun loadAllMovies() {
         loadPopularMovies()
         loadTopRatedMovies()
@@ -277,8 +276,6 @@ class MovieListFragment : Fragment() {
             }
         })
     }
-
-
 
     private fun showScrollHint() {
         binding.populerRecyclerView.post {
