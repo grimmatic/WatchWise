@@ -19,8 +19,6 @@
         android:scaleType="centerCrop"
         android:src="@drawable/ic_launcher_background"/>
 
-
-
     <TextView
         android:id="@+id/filmTitle"
         android:layout_width="match_parent"

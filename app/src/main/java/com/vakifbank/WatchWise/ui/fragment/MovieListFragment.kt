@@ -177,13 +177,11 @@ class MovieListFragment : Fragment() {
                         searchMovieAdapter.updateMovies(movies)
                     }
                 } else {
-                    Log.e("MovieListFragment", "Search API başarısız: ${response.code()}")
                     searchMovieAdapter.clearMovies()
                 }
             }
 
             override fun onFailure(call: Call<GetMoviesResponse>, t: Throwable) {
-                Log.e("MovieListFragment", "Search API çağrısı başarısız: ${t.message}")
                 searchMovieAdapter.clearMovies()
             }
         })
@@ -325,9 +323,6 @@ class MovieListFragment : Fragment() {
             findNavController().navigate(R.id.action_MovieListFragment_to_seeMoreFragment,bundle)
         }
     }
-
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

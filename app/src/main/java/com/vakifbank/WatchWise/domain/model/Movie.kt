@@ -15,11 +15,4 @@ data class Movie(
                  @SerializedName("vote_average") val rating: Float?,
 
 
-) : Parcelable{
-   /* val description: String?
-        get()=when {
-            !overview.isNullOrEmpty() -> overview
-            !tagline.isNullOrEmpty() -> tagline
-            else ->null
-        }*/
-}
+) : Parcelable

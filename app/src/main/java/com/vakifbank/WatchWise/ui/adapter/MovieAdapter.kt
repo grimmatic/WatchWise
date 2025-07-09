@@ -1,5 +1,6 @@
 package com.vakifbank.WatchWise.ui.adapter
 
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,6 +45,7 @@ class MovieAdapter(
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         val movie = movieList[position]
         holder.filmTitle.text = movie.title
+
 
         when (listType) {
             MovieListType.POPULAR -> holder.containerLayout.setBackgroundResource(R.drawable.rounded_bg_popular)

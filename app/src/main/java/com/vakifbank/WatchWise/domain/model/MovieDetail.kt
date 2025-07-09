@@ -20,15 +20,7 @@ data class MovieDetail(
     @SerializedName("budget") val budget: Long?,
     @SerializedName("revenue") val revenue: Long?,
     @SerializedName("genres") val genres: List<Genre>?,
-) : Parcelable{
-
- /*   val description: String?
-        get()=when {
-            !overview.isNullOrEmpty() -> overview
-            !tagline.isNullOrEmpty() -> tagline
-            else ->null
-        }*/
-}
+) : Parcelable
 
 
 @Parcelize
