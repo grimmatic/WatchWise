@@ -11,6 +11,7 @@ data class MovieDetail(
     @SerializedName("poster_path") val poster: String?,
     @SerializedName("backdrop_path") val backdrop: String?,
     @SerializedName("overview") val description: String?,
+    @SerializedName("tagline") val tagline: String?,
     @SerializedName("release_date") val releaseDate: String?,
     @SerializedName("vote_average") val rating: Float?,
     @SerializedName("vote_count") val voteCount: Int?,
@@ -19,7 +20,16 @@ data class MovieDetail(
     @SerializedName("budget") val budget: Long?,
     @SerializedName("revenue") val revenue: Long?,
     @SerializedName("genres") val genres: List<Genre>?,
-) : Parcelable
+) : Parcelable{
+
+ /*   val description: String?
+        get()=when {
+            !overview.isNullOrEmpty() -> overview
+            !tagline.isNullOrEmpty() -> tagline
+            else ->null
+        }*/
+}
+
 
 @Parcelize
 data class Genre(

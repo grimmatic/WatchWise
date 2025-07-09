@@ -10,8 +10,16 @@ data class Movie(
                  @SerializedName("title") val title: String?,
                  @SerializedName("poster_path") val poster: String?,
                  @SerializedName("overview") val description: String?,
+                 @SerializedName("tagline") val tagline: String?,
                  @SerializedName("id") val id: Int?,
                  @SerializedName("vote_average") val rating: Float?,
 
 
-) : Parcelable
+) : Parcelable{
+   /* val description: String?
+        get()=when {
+            !overview.isNullOrEmpty() -> overview
+            !tagline.isNullOrEmpty() -> tagline
+            else ->null
+        }*/
+}

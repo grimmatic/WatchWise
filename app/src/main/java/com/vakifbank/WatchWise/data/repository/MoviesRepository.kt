@@ -21,6 +21,7 @@ object MoviesRepository {
     fun getTopRatedMovies(page: Int) = api.getTopRatedMovies(page = page)
     fun getUpcomingMovies(page: Int) = api.getUpcomingMovies(page = page)
     fun getMovieDetails(movieId: Int?) = api.getMovieDetails(movieId = movieId)
+    fun getMovieDetailsInEnglish(movieId: Int?) = api.getMovieDetailsInEnglish(movieId = movieId)
     fun searchMovies(query: String, page: Int = 1) = api.searchMovies(query = query, page = page)
     fun getMovieVideos(movieId: Int) = api.getMovieVideos(movieId = movieId)
 

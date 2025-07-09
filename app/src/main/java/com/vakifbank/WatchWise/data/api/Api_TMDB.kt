@@ -35,6 +35,13 @@ interface Api_TMDB {
         @Query("language") language: String = "tr-TR"
     ): Call<MovieDetail>
 
+    @GET("movie/{movie_id}")
+    fun getMovieDetailsInEnglish(
+        @Path("movie_id") movieId: Int?,
+        @Query("api_key") apiKey: String = Constanst.apiConstansts.TMDB_API_KEY,
+        @Query("language") language: String = "en-US"
+    ): Call<MovieDetail>
+
 
     @GET("search/movie")
     fun searchMovies(

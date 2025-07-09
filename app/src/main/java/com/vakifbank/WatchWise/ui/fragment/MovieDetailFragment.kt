@@ -9,9 +9,13 @@ import android.widget.LinearLayout
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.vakifbank.WatchWise.R
+import com.vakifbank.WatchWise.data.repository.MoviesRepository
 import com.vakifbank.WatchWise.databinding.FragmentMovieDetailBinding
 import com.vakifbank.WatchWise.domain.model.MovieDetail
 import com.vakifbank.WatchWise.utils.parcelable
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MovieDetailFragment : Fragment() {
     private var _binding: FragmentMovieDetailBinding? = null
@@ -31,11 +35,12 @@ class MovieDetailFragment : Fragment() {
         }
     }
 
+
     private fun setupMovieDetails() {
-        binding.movieDescriptionTextView.movementMethod= android.text.method.ScrollingMovementMethod()
+        binding.movieDescriptionTextView.movementMethod = android.text.method.ScrollingMovementMethod()
 
         movieDetail?.let { movie ->
-
+            // Title
             movie.title?.takeIf { it.isNotEmpty() }?.let { title ->
                 binding.movieTitleTextView.text = title
                 binding.movieTitleTextView.visibility = View.VISIBLE
@@ -43,12 +48,12 @@ class MovieDetailFragment : Fragment() {
                 binding.movieTitleTextView.visibility = View.GONE
             }
 
-
             movie.description?.takeIf { it.isNotEmpty() }?.let { description ->
                 binding.movieDescriptionTextView.text = description
                 binding.movieDescriptionTextView.visibility = View.VISIBLE
             } ?: run {
-                binding.movieDescriptionTextView.visibility = View.GONE
+                // Eğer türkçe description yoksa ingilizce için tekrar api çağrısı yap
+                loadEnglishDescription(movie.id)
             }
 
             movie.language?.takeIf { it.isNotEmpty() }?.let { language ->
@@ -73,8 +78,31 @@ class MovieDetailFragment : Fragment() {
             }
 
             loadMoviePoster(movie.poster)
-            //   loadMovieBackDrop(movie.backdrop)
             setupGenreViews(movie.genres)
+        }
+    }
+
+    private fun loadEnglishDescription(movieId: Int?) {
+        movieId?.let { id ->
+            val call = MoviesRepository.getMovieDetailsInEnglish(id)
+            call.enqueue(object : Callback<MovieDetail> {
+                override fun onResponse(call: Call<MovieDetail>, response: Response<MovieDetail>) {
+                    if (response.isSuccessful) {
+                        response.body()?.description?.takeIf { it.isNotEmpty() }?.let { englishDescription ->
+                            binding.movieDescriptionTextView.text = englishDescription
+                            binding.movieDescriptionTextView.visibility = View.VISIBLE
+                        } ?: run {
+                            binding.movieDescriptionTextView.visibility = View.GONE
+                        }
+                    } else {
+                        binding.movieDescriptionTextView.visibility = View.GONE
+                    }
+                }
+
+                override fun onFailure(call: Call<MovieDetail>, t: Throwable) {
+                    binding.movieDescriptionTextView.visibility = View.GONE
+                }
+            })
         }
     }
     private fun loadMoviePoster(posterPath: String?) {
@@ -85,21 +113,7 @@ class MovieDetailFragment : Fragment() {
             .error(R.drawable.ic_launcher_background)
             .into(binding.posterImageView)
     }
-  /*  private fun loadMovieBackDrop(backdropPath: String?) {
-        val backDropUrl = "https://image.tmdb.org/t/p/w500$backdropPath"
-        Glide.with(requireContext())
-            .load(backDropUrl)
-            .placeholder(R.drawable.ic_launcher_background)
-            .error(R.drawable.ic_launcher_background)
-            .into(object : CustomTarget<Drawable>() {
-                override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                    binding.detailConstraintLayout.background = resource
-                }
-                override fun onLoadCleared(placeholder: Drawable?) {
-                    binding.detailConstraintLayout.background = placeholder
-                }
-            })
-    }*/
+
     private fun setupGenreViews(genres: List<com.vakifbank.WatchWise.domain.model.Genre>?) {
         binding?.run {
             val genreList = genres?.take(3) ?: emptyList()
