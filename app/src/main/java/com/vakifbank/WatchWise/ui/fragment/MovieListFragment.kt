@@ -59,6 +59,7 @@ class MovieListFragment : Fragment() {
         setUpSearchSection()
         loadAllMovies()
         showScrollHint()
+        navigateSeeMoreFragment()
 
     }
     override fun onResume() {
@@ -277,11 +278,7 @@ class MovieListFragment : Fragment() {
         })
     }
 
-      fun popularSeeMore(view : View) {
 
-          findNavController().navigate(R.id.action_MovieListFragment_to_seeMoreFragment)
-
-      }
 
     private fun showScrollHint() {
         binding.populerRecyclerView.post {
@@ -296,6 +293,13 @@ class MovieListFragment : Fragment() {
             }, 1000)
         }
     }
+
+   fun navigateSeeMoreFragment(){
+        binding.seeMore.setOnClickListener {
+            findNavController().navigate(R.id.action_MovieListFragment_to_seeMoreFragment)
+        }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

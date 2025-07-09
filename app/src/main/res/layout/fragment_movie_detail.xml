@@ -21,7 +21,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="30dp"
         android:backgroundTint="@color/primary_purple"
         android:clickable="true"
         android:src="@android:drawable/ic_menu_revert"

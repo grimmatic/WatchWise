@@ -22,7 +22,7 @@
             app:cardCornerRadius="16dp"
             app:cardElevation="8dp"
             android:layout_marginBottom="24dp"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -167,18 +167,16 @@
                             android:id="@+id/seeMore"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:padding="8dp"
                             android:text="@string/see_more"
                             android:textColor="#FF4081"
-                            android:textStyle="bold"
                             android:textSize="16sp"
-                            android:background="?android:attr/selectableItemBackground"
-                            android:padding="8dp"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="@id/mostPopularText"
+                            android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="@id/mostPopularText"
-                            android:clickable="true"
-                            android:onClick="popularSeeMore"
-                            />
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/mostPopularText" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 

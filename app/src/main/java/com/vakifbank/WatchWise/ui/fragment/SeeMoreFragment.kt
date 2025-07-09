@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.databinding.FragmentMovieDetailBinding
 import com.vakifbank.WatchWise.databinding.FragmentSeeMoreBinding
@@ -29,5 +30,19 @@ class SeeMoreFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        backButtonListener()
+
+
+
+
+    }
+
+
+    fun backButtonListener(){
+        binding.backButton.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
     }
 }
