@@ -10,6 +10,7 @@
     tools:context=".ui.fragment.MovieDetailFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_marginBottom="-60dp"
         android:id="@+id/detailConstraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -64,7 +65,6 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@android:drawable/ic_dialog_info"
-                android:layout_marginBottom="4dp"
                 app:tint="@color/white"/>
 
             <TextView
@@ -75,7 +75,7 @@
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="2dp" />
+                 />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -103,7 +103,6 @@
                 android:layout_width="33dp"
                 android:layout_height="33dp"
                 android:src="@android:drawable/ic_menu_recent_history"
-                android:layout_marginBottom="2dp"
                 app:tint="@color/white" />
 
             <TextView
@@ -114,7 +113,7 @@
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="2dp" />
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -141,7 +140,6 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@android:drawable/btn_star_big_on"
-                android:layout_marginBottom="2dp"
                 app:tint="@color/white" />
 
             <TextView
@@ -152,7 +150,7 @@
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="2dp" />
+            />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -265,7 +263,7 @@
                     android:id="@+id/movieDescriptionTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="5dp"
                     android:maxLines="7"
                     android:fontFamily="@font/lato_black"
                     android:text="Description"
@@ -281,7 +279,7 @@
                     android:id="@+id/trailerButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="10dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="4dp"
                     android:clickable="true"
@@ -323,7 +321,7 @@
                                 android:text="YouTube'da aç"
                                 android:textColor="@color/white_70"
                                 android:textSize="14sp"
-                                android:layout_marginTop="2dp" />
+                                />
 
                         </LinearLayout>
 
