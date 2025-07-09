@@ -59,7 +59,9 @@ class MovieListFragment : Fragment() {
         setUpSearchSection()
         loadAllMovies()
         showScrollHint()
-        navigateSeeMoreFragment()
+        navigateSeeMorePopularFragment()
+        navigateSeeMoreTopRatedFragment()
+        navigateSeeMoreUpcomingFragment()
 
     }
     override fun onResume() {
@@ -294,11 +296,37 @@ class MovieListFragment : Fragment() {
         }
     }
 
-   fun navigateSeeMoreFragment(){
+    fun navigateSeeMorePopularFragment(){
+        val bundle = Bundle().apply {
+            putString("category_type", "popular")
+            putString("category_title", "En Popüler Filmler")
+        }
         binding.seeMore.setOnClickListener {
-            findNavController().navigate(R.id.action_MovieListFragment_to_seeMoreFragment)
+            findNavController().navigate(R.id.action_MovieListFragment_to_seeMoreFragment,bundle)
         }
     }
+
+    fun navigateSeeMoreTopRatedFragment(){
+        val bundle = Bundle().apply {
+            putString("category_type", "top_rated")
+            putString("category_title", "En İyi Filmler")
+        }
+        binding.seeMore2.setOnClickListener {
+            findNavController().navigate(R.id.action_MovieListFragment_to_seeMoreFragment,bundle)
+        }
+    }
+
+    fun navigateSeeMoreUpcomingFragment(){
+        val bundle = Bundle().apply {
+            putString("category_type", "upcoming")
+            putString("category_title", "Yakında")
+        }
+        binding.seeMore3.setOnClickListener {
+            findNavController().navigate(R.id.action_MovieListFragment_to_seeMoreFragment,bundle)
+        }
+    }
+
+
 
 
     override fun onDestroyView() {
