@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "491458320294",
+    "project_id": "watchwise-a52b9",
+    "storage_bucket": "watchwise-a52b9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:491458320294:android:e6ad77fab4582c22556167",
+        "android_client_info": {
+          "package_name": "com.vakifbank.WatchWise"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5Rc_Y__gAqU4-n_uD1LBk3Tp_EbNn_lk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
