@@ -80,11 +80,11 @@ class AuthFragment : Fragment() {
 
         if (!validateInput(email, password)) return
 
-        showLoading(true)
+        showLoading(isLoading = true)
 
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
-                showLoading(false)
+                showLoading(isLoading = false)
                 if (task.isSuccessful) {
                     showToast("Giriş başarılı!")
                     navigateToHome()
@@ -100,40 +100,42 @@ class AuthFragment : Fragment() {
 
         if (!validateInput(email, password)) return
 
-        showLoading(true)
+        showLoading(isLoading = true)
 
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
-                showLoading(false)
+                showLoading(isLoading = false)
                 if (task.isSuccessful) {
                     showToast("Kayıt başarılı!")
                     navigateToHome()
                 } else {
-                    showToast("Kayıt başarısız: ${task.exception?.message}")
+                    showToast("Kayıt başarısız!")
                 }
             }
     }
 
     private fun validateInput(email: String, password: String): Boolean {
         if (email.isEmpty()) {
-            binding.emailEditText.error = "E-posta adresi gerekli"
+            binding.emailInputLayout.error = "E-posta adresi gerekli"
+            binding.emailInputLayout.setErrorIconDrawable(null)
             return false
         }
 
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.emailEditText.error = "Geçerli bir e-posta adresi girin"
+            binding.emailInputLayout.error = "Geçerli bir e-posta adresi girin"
+            binding.emailInputLayout.setErrorIconDrawable(null)
             return false
         }
 
         if (password.isEmpty()) {
-            binding.TextInputLayout.error = "Şifre gerekli"
-            binding.TextInputLayout.setErrorIconDrawable(null)
+            binding.passwordInputLayout.error = "Şifre gerekli"
+            binding.passwordInputLayout.setErrorIconDrawable(null)
             return false
         }
 
         if (password.length < 6) {
-            binding.TextInputLayout.error = "Şifre en az 6 karakter olmalı"
-            binding.TextInputLayout.setErrorIconDrawable(null)
+            binding.passwordInputLayout.error = "Şifre en az 6 karakter olmalı"
+            binding.passwordInputLayout.setErrorIconDrawable(null)
 
             return false
         }

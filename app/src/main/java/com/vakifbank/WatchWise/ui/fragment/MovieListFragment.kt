@@ -63,7 +63,7 @@ class MovieListFragment : Fragment() {
         setUpRecyclerViews()
         setUpTextColors()
         setUpSearchSection()
-        setUpLogoutButton()
+        setUpAuthButton()
         loadAllMovies()
         showScrollHint()
         navigateSeeMorePopularFragment()
@@ -73,15 +73,32 @@ class MovieListFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        updateAuthButton()
+
         // Eğer search mode'dayken detay sayfasından dönüyorsak search durumunu geri yükle
         if (isSearchMode && lastSearchQuery.isNotEmpty()) {
             restoreSearchState()
         }
     }
 
-    private fun setUpLogoutButton() {
+    private fun setUpAuthButton() {
         binding.logoutButton.setOnClickListener {
-            showLogoutConfirmationDialog()
+            if (auth.currentUser != null) {
+                showLogoutConfirmationDialog()
+            } else {
+                navigateToAuth()
+            }
+        }
+        updateAuthButton()
+    }
+
+    private fun updateAuthButton() {
+        if (auth.currentUser != null) {
+            binding.logoutButton.setImageResource(android.R.drawable.ic_lock_power_off)
+            binding.logoutButton.contentDescription = "Çıkış Yap"
+        } else {
+            binding.logoutButton.setImageResource(android.R.drawable.ic_lock_idle_lock)
+            binding.logoutButton.contentDescription = "Giriş Yap"
         }
     }
 
@@ -99,6 +116,10 @@ class MovieListFragment : Fragment() {
     private fun logout() {
         auth.signOut()
         Toast.makeText(requireContext(), "Çıkış yapıldı", Toast.LENGTH_SHORT).show()
+        updateAuthButton()
+    }
+
+    private fun navigateToAuth() {
         findNavController().navigate(R.id.action_MovieListFragment_to_authFragment)
     }
 
