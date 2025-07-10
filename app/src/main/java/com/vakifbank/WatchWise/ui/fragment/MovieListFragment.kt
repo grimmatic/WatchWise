@@ -9,10 +9,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.auth.FirebaseAuth
 import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.data.repository.MoviesRepository
 import com.vakifbank.WatchWise.databinding.FragmentMovieListBinding
@@ -43,12 +46,15 @@ class MovieListFragment : Fragment() {
     private var isSearchMode = false
     private var lastSearchQuery = ""
 
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMovieListBinding.inflate(inflater, container, false)
+        auth = FirebaseAuth.getInstance()
         return binding.root
     }
 
@@ -57,19 +63,43 @@ class MovieListFragment : Fragment() {
         setUpRecyclerViews()
         setUpTextColors()
         setUpSearchSection()
+        setUpLogoutButton()
         loadAllMovies()
         showScrollHint()
         navigateSeeMorePopularFragment()
         navigateSeeMoreTopRatedFragment()
         navigateSeeMoreUpcomingFragment()
-
     }
+
     override fun onResume() {
         super.onResume()
         // Eğer search mode'dayken detay sayfasından dönüyorsak search durumunu geri yükle
         if (isSearchMode && lastSearchQuery.isNotEmpty()) {
             restoreSearchState()
         }
+    }
+
+    private fun setUpLogoutButton() {
+        binding.logoutButton.setOnClickListener {
+            showLogoutConfirmationDialog()
+        }
+    }
+
+    private fun showLogoutConfirmationDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Çıkış Yap")
+            .setMessage("Çıkış yapmak istediginizden emin misiniz?")
+            .setPositiveButton("Evet") { _, _ ->
+                logout()
+            }
+            .setNegativeButton("Hayır", null)
+            .show()
+    }
+
+    private fun logout() {
+        auth.signOut()
+        Toast.makeText(requireContext(), "Çıkış yapıldı", Toast.LENGTH_SHORT).show()
+        findNavController().navigate(R.id.action_MovieListFragment_to_authFragment)
     }
 
     private fun restoreSearchState() {
