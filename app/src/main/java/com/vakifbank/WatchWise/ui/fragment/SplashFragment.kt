@@ -14,7 +14,7 @@ import com.vakifbank.WatchWise.databinding.FragmentSplashBinding
 
 class SplashFragment : Fragment() {
     private lateinit var binding: FragmentSplashBinding
-    private var splashTimeout: Long = 3000
+    private var splashTimeout: Long = 2000
     private lateinit var auth: FirebaseAuth
 
     override fun onCreateView(

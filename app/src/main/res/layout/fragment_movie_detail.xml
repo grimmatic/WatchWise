@@ -232,15 +232,14 @@
             android:id="@+id/movieInfoCardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_marginEnd="15dp"
             android:layout_marginBottom="20dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="8dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/linearLayout4"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout4"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -264,39 +263,39 @@
                     android:layout_width="match_parent"
                     android:layout_height="120dp"
                     android:layout_marginTop="5dp"
+                    android:fadeScrollbars="false"
                     android:fontFamily="@font/lato_black"
+                    android:overScrollMode="always"
+                    android:scrollbarSize="4dp"
+                    android:scrollbarStyle="outsideOverlay"
+                    android:scrollbarThumbVertical="@color/primary_purple"
+                    android:scrollbars="vertical"
                     android:text="Description"
                     android:textColor="@color/black"
-                    android:textSize="18dp"
-                    android:scrollbars="vertical"
-                    android:scrollbarStyle="outsideOverlay"
-                    android:scrollbarSize="4dp"
-                    android:scrollbarThumbVertical="@color/primary_purple"
-                    android:fadeScrollbars="false"
-                    android:overScrollMode="always" />
+                    android:textSize="18dp" />
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/trailerButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
+                    android:clickable="true"
                     app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp"
-                    android:clickable="true">
+                    app:cardElevation="4dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
                         android:background="@drawable/rounded_bg_detail_cardview"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:padding="16dp">
 
                         <ImageView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
-                            android:src="@android:drawable/ic_media_play"
                             android:layout_marginEnd="12dp"
+                            android:src="@android:drawable/ic_media_play"
                             app:tint="@color/white" />
 
                         <LinearLayout
