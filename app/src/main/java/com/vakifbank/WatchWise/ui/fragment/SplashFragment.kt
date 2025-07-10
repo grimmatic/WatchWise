@@ -8,25 +8,28 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.databinding.FragmentSplashBinding
 
 class SplashFragment : Fragment() {
     private lateinit var binding: FragmentSplashBinding
     private var splashTimeout: Long = 3000
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSplashBinding.inflate(inflater, container, false)
+        auth = FirebaseAuth.getInstance()
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         startAnimations()
-        navigateToHome()
+        checkAuthAndNavigate()
     }
 
     private fun startAnimations() {
@@ -51,10 +54,14 @@ class SplashFragment : Fragment() {
             .start()
     }
 
-    private fun navigateToHome() {
+    private fun checkAuthAndNavigate() {
         Handler(Looper.getMainLooper()).postDelayed({
             if (isAdded && !isRemoving) {
-                findNavController().navigate(R.id.action_splashFragment_to_MovieListFragment)
+                if (auth.currentUser != null) {
+                    findNavController().navigate(R.id.action_splashFragment_to_MovieListFragment)
+                } else {
+                    findNavController().navigate(R.id.action_splashFragment_to_authFragment)
+                }
             }
         }, splashTimeout)
     }
