@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.vakifbank.WatchWise" />
+                  <option name="mobileSdkAppId" value="1:491458320294:android:e6ad77fab4582c22556167" />
+                  <option name="projectId" value="watchwise-a52b9" />
+                  <option name="projectNumber" value="491458320294" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

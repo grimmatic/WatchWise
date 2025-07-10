@@ -3,7 +3,7 @@ package com.vakifbank.WatchWise.domain.model
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Movie(
@@ -13,6 +13,4 @@ data class Movie(
                  @SerializedName("tagline") val tagline: String?,
                  @SerializedName("id") val id: Int?,
                  @SerializedName("vote_average") val rating: Float?,
-
-
-) : Parcelable
+    ) : Parcelable
