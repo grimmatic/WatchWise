@@ -91,7 +91,7 @@ class SeeMoreFragment : Fragment() {
                     val visibleItemCount = layoutManager.childCount
                     val totalItemCount = layoutManager.itemCount
                     val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-                    println("visibleItemCount: $visibleItemCount, totalItemCount: $totalItemCount, firstVisibleItemPosition: $firstVisibleItemPosition")
+                   // println("visibleItemCount: $visibleItemCount, totalItemCount: $totalItemCount, firstVisibleItemPosition: $firstVisibleItemPosition")
 
                     // sayfanın sonuna (20 filme) yaklaştığında yeni sayfa yükle
                     if (!isLoading && currentPage < totalPages) {
