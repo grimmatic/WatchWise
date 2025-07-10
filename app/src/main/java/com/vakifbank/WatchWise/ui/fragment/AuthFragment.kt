@@ -127,14 +127,14 @@ class AuthFragment : Fragment() {
 
         if (password.isEmpty()) {
             binding.TextInputLayout.error = "Şifre gerekli"
-            binding.TextInputLayout.setErrorIconDrawable(R.drawable.no_icon)
-         //   binding.TextInputLayout.passwordVisibilityToggleDrawable?.setVisible(true, false)
+            binding.TextInputLayout.setErrorIconDrawable(null)
             return false
         }
 
         if (password.length < 6) {
             binding.TextInputLayout.error = "Şifre en az 6 karakter olmalı"
-            binding.TextInputLayout.setErrorIconDrawable(R.drawable.no_icon)
+            binding.TextInputLayout.setErrorIconDrawable(null)
+
             return false
         }
 
