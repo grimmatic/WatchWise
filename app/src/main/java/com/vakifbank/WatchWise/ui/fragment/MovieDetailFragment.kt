@@ -8,11 +8,16 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
 import com.vakifbank.WatchWise.R
+import com.vakifbank.WatchWise.data.repository.FavoriteRepository
 import com.vakifbank.WatchWise.data.repository.MoviesRepository
 import com.vakifbank.WatchWise.databinding.FragmentMovieDetailBinding
+import com.vakifbank.WatchWise.domain.model.Movie
 import com.vakifbank.WatchWise.domain.model.MovieDetail
 import com.vakifbank.WatchWise.domain.model.MovieVideosResponse
 import com.vakifbank.WatchWise.utils.parcelable
@@ -21,15 +26,19 @@ import retrofit2.Callback
 import retrofit2.Response
 import androidx.core.net.toUri
 import com.vakifbank.WatchWise.utils.toRatingString
+import kotlinx.coroutines.launch
 
 class MovieDetailFragment : BaseFragment() {
     private var _binding: FragmentMovieDetailBinding? = null
     private val binding get() = _binding!!
     private var movieDetail: MovieDetail? = null
     private var trailerKey: String? = null
+    private var isFavorite = false
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = FirebaseAuth.getInstance()
         arguments?.let { bundle ->
             movieDetail = bundle.parcelable<MovieDetail>("movie_detail_data")
         }
@@ -45,6 +54,110 @@ class MovieDetailFragment : BaseFragment() {
             trailerKey?.let { key ->
                 openYouTubeVideo(key)
             }
+        }
+
+        binding.addToFavoriteButton.setOnClickListener {
+            handleFavoriteClick()
+        }
+
+        binding.goToFavoritesFab.setOnClickListener {
+            if (auth.currentUser != null) {
+                findNavController().navigate(R.id.action_movieDetailFragment_to_favoriteFragment)
+            } else {
+                Toast.makeText(requireContext(), "Favorileri görmek için giriş yapmalısınız", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun handleFavoriteClick() {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            Toast.makeText(requireContext(), "Favorilere eklemek için giriş yapmalısınız", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        movieDetail?.let { detail ->
+            lifecycleScope.launch {
+                try {
+                    if (isFavorite) {
+                        detail.id?.let { movieId ->
+                            val success = FavoriteRepository.removeFromFavorites(movieId)
+                            if (success) {
+                                isFavorite = false
+                                updateFavoriteButton()
+                                Toast.makeText(requireContext(), "Favorilerden çıkarıldı", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(requireContext(), "Favorilerden çıkarılırken hata oluştu", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        val movie = Movie(
+                            id = detail.id,
+                            title = detail.title,
+                            poster = detail.poster,
+                            description = detail.description,
+                            rating = detail.rating,
+                            tagline = detail.tagline
+                        )
+
+                        val success = FavoriteRepository.addToFavorites(movie)
+                        if (success) {
+                            isFavorite = true
+                            updateFavoriteButton()
+                            Toast.makeText(requireContext(), "Favorilere eklendi", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(requireContext(), "Favorilere eklenirken hata oluştu", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), "Bir hata oluştu", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun checkIfFavorite() {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            movieDetail?.id?.let { movieId ->
+                lifecycleScope.launch {
+                    try {
+                        isFavorite = FavoriteRepository.isMovieFavorite(movieId)
+                        updateFavoriteButton()
+                        updateGoToFavoritesButton()
+                    } catch (e: Exception) {
+                        isFavorite = false
+                        updateFavoriteButton()
+                        updateGoToFavoritesButton()
+                    }
+                }
+            }
+        } else {
+            updateGoToFavoritesButton()
+        }
+    }
+
+    private fun updateFavoriteButton() {
+        if (isFavorite) {
+            binding.favoriteButtonIcon.setImageResource(android.R.drawable.btn_star_big_on)
+            binding.favoriteButtonText.text = "Favorilerden Çıkar"
+            binding.favoriteButtonSubtext.text = "Bu filmi favorilerinizden çıkarın"
+            binding.addToFavoriteButton.setCardBackgroundColor(requireContext().getColor(R.color.top_rated_green))
+            binding.addFavoriteLinear.setBackgroundColor(requireContext().getColor(R.color.top_rated_green))
+        } else {
+            binding.favoriteButtonIcon.setImageResource(android.R.drawable.btn_star_big_off)
+            binding.favoriteButtonText.text = "Favorilere Ekle"
+            binding.favoriteButtonSubtext.text = "Bu filmi favorilerinize ekleyin"
+            binding.addToFavoriteButton.setCardBackgroundColor(requireContext().getColor(R.color.primary_purple))
+            binding.addFavoriteLinear.setBackgroundColor(requireContext().getColor(R.color.primary_purple))
+        }
+    }
+
+    private fun updateGoToFavoritesButton() {
+        if (auth.currentUser != null) {
+            binding.goToFavoritesFab.visibility = View.VISIBLE
+        } else {
+            binding.goToFavoritesFab.visibility = View.GONE
         }
     }
 
@@ -148,7 +261,7 @@ class MovieDetailFragment : BaseFragment() {
             }
             loadMoviePoster(posterPath = movie.poster)
             setupGenreViews(movie.genres)
-            loadMovieTrailer( movieId = movie.id)
+            loadMovieTrailer(movieId = movie.id)
         }
     }
 
@@ -220,11 +333,11 @@ class MovieDetailFragment : BaseFragment() {
         }
     }
 
-    fun genreLayoutGone(genreLayout: LinearLayout){
+    private fun genreLayoutGone(genreLayout: LinearLayout) {
         genreLayout.visibility = View.GONE
     }
 
-    fun genreLayoutVisible(genreLayout: LinearLayout){
+    private fun genreLayoutVisible(genreLayout: LinearLayout) {
         genreLayout.visibility = View.VISIBLE
     }
 
@@ -244,7 +357,7 @@ class MovieDetailFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         initUi()
         setupMovieDetails()
-        setupFavoriteButton(binding.favoriteFab)
+        checkIfFavorite()
     }
 
     override fun onDestroyView() {
