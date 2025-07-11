@@ -22,7 +22,7 @@ import retrofit2.Response
 import androidx.core.net.toUri
 import com.vakifbank.WatchWise.utils.toRatingString
 
-class MovieDetailFragment : Fragment() {
+class MovieDetailFragment : BaseFragment() {
     private var _binding: FragmentMovieDetailBinding? = null
     private val binding get() = _binding!!
     private var movieDetail: MovieDetail? = null
@@ -244,6 +244,7 @@ class MovieDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initUi()
         setupMovieDetails()
+        setupFavoriteButton(binding.favoriteFab)
     }
 
     override fun onDestroyView() {

@@ -29,7 +29,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class MovieListFragment : Fragment() {
+class MovieListFragment : BaseFragment() {
 
     private var _binding: FragmentMovieListBinding? = null
     private val binding get() = _binding!!
@@ -64,6 +64,7 @@ class MovieListFragment : Fragment() {
         setUpTextColors()
         setUpSearchSection()
         setUpAuthButton()
+        setupFavoriteButton(binding.favoriteFab)
         loadAllMovies()
         showScrollHint()
         navigateSeeMorePopularFragment()
@@ -74,7 +75,7 @@ class MovieListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         updateAuthButton()
-
+        setupFavoriteButton(binding.favoriteFab)
         // Eğer search mode'dayken detay sayfasından dönüyorsak search durumunu geri yükle
         if (isSearchMode && lastSearchQuery.isNotEmpty()) {
             restoreSearchState()
@@ -117,6 +118,7 @@ class MovieListFragment : Fragment() {
         auth.signOut()
         Toast.makeText(requireContext(), "Çıkış yapıldı", Toast.LENGTH_SHORT).show()
         updateAuthButton()
+        setupFavoriteButton(binding.favoriteFab)
     }
 
     private fun navigateToAuth() {
