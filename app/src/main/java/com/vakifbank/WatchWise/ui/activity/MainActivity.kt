@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.databinding.ActivityMainBinding
+import hideSystemUI
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -19,6 +20,9 @@ class MainActivity : AppCompatActivity() {
         navController.navigate(R.id.splashFragment)
         supportActionBar?.hide()
 
-
+    }
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) hideSystemUI()
     }
 }

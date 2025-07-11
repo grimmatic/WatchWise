@@ -23,7 +23,7 @@ enum class MovieCategory {
     POPULAR, TOP_RATED, UPCOMING
 }
 
-class SeeMoreFragment : Fragment() {
+class SeeMoreFragment : BaseFragment() {
 
     private var _binding: FragmentSeeMoreBinding? = null
     private val binding get() = _binding!!
@@ -64,6 +64,7 @@ class SeeMoreFragment : Fragment() {
 
         setupUI()
         setupRecyclerView()
+        setupFavoriteButton(binding.favoriteFab)
         loadMovies(currentPage)
     }
 
