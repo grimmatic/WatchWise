@@ -261,7 +261,6 @@ class MovieListFragment : BaseFragment() {
             }
 
             override fun onFailure(call: Call<GetMoviesResponse>, t: Throwable) {
-                Log.e("MovieListFragment", "Popular API çağrısı başarısız: ${t.message}")
             }
         })
     }
@@ -281,7 +280,6 @@ class MovieListFragment : BaseFragment() {
             }
 
             override fun onFailure(call: Call<GetMoviesResponse>, t: Throwable) {
-                Log.e("MovieListFragment", "Top Rated API çağrısı başarısız: ${t.message}")
             }
         })
     }
@@ -301,7 +299,6 @@ class MovieListFragment : BaseFragment() {
             }
 
             override fun onFailure(call: Call<GetMoviesResponse>, t: Throwable) {
-                Log.e("MovieListFragment", "Upcoming API çağrısı başarısız: ${t.message}")
             }
         })
     }
@@ -325,7 +322,6 @@ class MovieListFragment : BaseFragment() {
             }
 
             override fun onFailure(call: Call<MovieDetail>, t: Throwable) {
-                Log.e("MovieListFragment", "hata: ${t.message}")
             }
         })
     }
