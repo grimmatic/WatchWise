@@ -97,7 +97,7 @@ class MovieListFragment : Fragment() {
             binding.logoutButton.setImageResource(android.R.drawable.ic_lock_power_off)
             binding.logoutButton.contentDescription = "Çıkış Yap"
         } else {
-            binding.logoutButton.setImageResource(android.R.drawable.ic_lock_idle_lock)
+            binding.logoutButton.setImageResource(R.drawable.login_register)
             binding.logoutButton.contentDescription = "Giriş Yap"
         }
     }
