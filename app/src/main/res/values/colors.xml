@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-<color name="white">#FFFFFF</color>
-<color name="black">#FF000000</color>
-<color name="white_70">#B3FFFFFF</color>
-<color name="primary_purple">#667eea</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="white_70">#B3FFFFFF</color>
+    <color name="primary_purple">#667eea</color>
     <color name="primary_pink">#f093fb</color>
     <color name="main_theme_color">#761CB9</color>
     <color name="popular_purple">#761CB9</color>
     <color name="top_rated_green">#4CAF50</color>
     <color name="upcoming_orange">#FF9800</color>
+    <color name="gray">#808080</color>
+    <color name="primary_purple_light">#E8E0FF</color>
 </resources>
