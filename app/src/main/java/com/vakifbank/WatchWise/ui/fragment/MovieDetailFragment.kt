@@ -2,31 +2,35 @@ package com.vakifbank.WatchWise.ui.fragment
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.data.repository.FavoriteRepository
 import com.vakifbank.WatchWise.data.repository.MoviesRepository
+import com.vakifbank.WatchWise.data.repository.ReviewRepository
 import com.vakifbank.WatchWise.databinding.FragmentMovieDetailBinding
 import com.vakifbank.WatchWise.domain.model.Movie
 import com.vakifbank.WatchWise.domain.model.MovieDetail
+import com.vakifbank.WatchWise.domain.model.MovieRatingSummary
+import com.vakifbank.WatchWise.domain.model.MovieReview
 import com.vakifbank.WatchWise.domain.model.MovieVideosResponse
+import com.vakifbank.WatchWise.ui.adapter.ReviewAdapter
 import com.vakifbank.WatchWise.utils.parcelable
+import com.vakifbank.WatchWise.utils.toRatingString
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import androidx.core.net.toUri
-import com.vakifbank.WatchWise.utils.toRatingString
-import kotlinx.coroutines.launch
 
 class MovieDetailFragment : BaseFragment() {
     private var _binding: FragmentMovieDetailBinding? = null
@@ -35,6 +39,12 @@ class MovieDetailFragment : BaseFragment() {
     private var trailerKey: String? = null
     private var isFavorite = false
     private lateinit var auth: FirebaseAuth
+    private lateinit var reviewAdapter: ReviewAdapter
+    private val reviewList = mutableListOf<MovieReview>()
+    private var userReview: MovieReview? = null
+    private var currentRating: Float = 0f
+    private var currentComment: String = ""
+    private var ratingSummary: MovieRatingSummary? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +76,197 @@ class MovieDetailFragment : BaseFragment() {
             } else {
                 Toast.makeText(requireContext(), "Favorileri görmek için giriş yapmalısınız", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        setupReviewSection()
+    }
+
+    private fun setupReviewSection() {
+        reviewAdapter = ReviewAdapter(reviewList, auth.currentUser?.uid)
+        binding.reviewsRecyclerView.apply {
+            adapter = reviewAdapter
+            layoutManager = LinearLayoutManager(context)
+            isNestedScrollingEnabled = false
+        }
+
+        setupRatingButtons()
+
+        binding.submitReviewButton.setOnClickListener {
+            handleReviewSubmission()
+        }
+
+        binding.deleteReviewButton.setOnClickListener {
+            handleReviewDeletion()
+        }
+    }
+
+    private fun setupRatingButtons() {
+        val ratingButtons = listOf(
+            binding.rating1, binding.rating2, binding.rating3, binding.rating4, binding.rating5,
+            binding.rating6, binding.rating7, binding.rating8, binding.rating9, binding.rating10
+        )
+
+        ratingButtons.forEachIndexed { index, button ->
+            button.setOnClickListener {
+                currentRating = (index + 1).toFloat()
+                updateRatingButtons()
+            }
+        }
+    }
+
+    private fun updateRatingButtons() {
+        val ratingButtons = listOf(
+            binding.rating1, binding.rating2, binding.rating3, binding.rating4, binding.rating5,
+            binding.rating6, binding.rating7, binding.rating8, binding.rating9, binding.rating10
+        )
+
+        ratingButtons.forEachIndexed { index, button ->
+            if (index < currentRating.toInt()) {
+                button.setColorFilter(requireContext().getColor(R.color.primary_purple))
+            } else {
+                button.setColorFilter(requireContext().getColor(R.color.gray))
+            }
+        }
+    }
+
+    private fun handleReviewSubmission() {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            Toast.makeText(requireContext(), "Yorum yapmak için giriş yapmalısınız", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (currentRating == 0f) {
+            Toast.makeText(requireContext(), "Lütfen bir puan verin", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val comment = binding.commentEditText.text.toString().trim()
+        currentComment = comment
+
+        val movieId = movieDetail?.id
+        if (movieId == null) {
+            Toast.makeText(requireContext(), "Film bilgisi bulunamadı", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        binding.submitReviewButton.isEnabled = false
+        binding.submitReviewButton.text = "Gönderiliyor..."
+
+        lifecycleScope.launch {
+            try {
+                val success = if (userReview != null) {
+                    ReviewRepository.updateReview(movieId, currentRating, comment)
+                } else {
+                    ReviewRepository.addReview(movieId, currentRating, comment)
+                }
+
+                if (success) {
+                    Toast.makeText(requireContext(), "Yorumunuz kaydedildi", Toast.LENGTH_SHORT).show()
+                    loadReviews()
+                    loadRatingSummary()
+                    binding.commentEditText.setText("")
+                    currentRating = 0f
+                    updateRatingButtons()
+                } else {
+                    Toast.makeText(requireContext(), "Yorum kaydedilemedi", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Bir hata oluştu", Toast.LENGTH_SHORT).show()
+            } finally {
+                binding.submitReviewButton.isEnabled = true
+                binding.submitReviewButton.text = "Gönder"
+            }
+        }
+    }
+
+    private fun handleReviewDeletion() {
+        val movieId = movieDetail?.id ?: return
+
+        binding.deleteReviewButton.isEnabled = false
+        binding.deleteReviewButton.text = "Siliniyor..."
+
+        lifecycleScope.launch {
+            try {
+                val success = ReviewRepository.deleteReview(movieId)
+                if (success) {
+                    Toast.makeText(requireContext(), "Yorumunuz silindi", Toast.LENGTH_SHORT).show()
+                    loadReviews()
+                    loadRatingSummary()
+                    userReview = null
+                    currentRating = 0f
+                    currentComment = ""
+                    binding.commentEditText.setText("")
+                    updateRatingButtons()
+                    updateReviewUI()
+                } else {
+                    Toast.makeText(requireContext(), "Yorum silinemedi", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Bir hata oluştu", Toast.LENGTH_SHORT).show()
+            } finally {
+                binding.deleteReviewButton.isEnabled = true
+                binding.deleteReviewButton.text = "Sil"
+            }
+        }
+    }
+
+    private fun loadReviews() {
+        val movieId = movieDetail?.id ?: return
+
+        lifecycleScope.launch {
+            try {
+                val reviews = ReviewRepository.getMovieReviews(movieId)
+                reviewList.clear()
+                reviewList.addAll(reviews)
+                reviewAdapter.notifyDataSetChanged()
+
+                userReview = ReviewRepository.getUserReview(movieId)
+                updateReviewUI()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Yorumlar yüklenemedi", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun loadRatingSummary() {
+        val movieId = movieDetail?.id ?: return
+
+        lifecycleScope.launch {
+            try {
+                ratingSummary = ReviewRepository.getMovieRatingSummary(movieId)
+                updateRatingSummaryUI()
+            } catch (e: Exception) {
+            }
+        }
+    }
+
+    private fun updateReviewUI() {
+        if (auth.currentUser != null) {
+            binding.reviewSection.visibility = View.VISIBLE
+
+            userReview?.let { review ->
+                binding.commentEditText.setText(review.comment)
+                currentRating = review.rating ?: 0f
+                currentComment = review.comment ?: ""
+                updateRatingButtons()
+                binding.deleteReviewButton.visibility = View.VISIBLE
+            } ?: run {
+                binding.deleteReviewButton.visibility = View.GONE
+            }
+        } else {
+            binding.reviewSection.visibility = View.GONE
+            binding.loginPromptTextView.visibility = View.VISIBLE
+        }
+    }
+
+    private fun updateRatingSummaryUI() {
+        ratingSummary?.let { summary ->
+            binding.averageRatingTextView.text = summary.averageRating?.toRatingString() ?: "0.0"
+            binding.totalReviewsTextView.text = "${summary.totalReviews ?: 0} değerlendirme"
+            binding.ratingSummaryLayout.visibility = View.VISIBLE
+        } ?: run {
+            binding.ratingSummaryLayout.visibility = View.GONE
         }
     }
 
@@ -358,6 +559,8 @@ class MovieDetailFragment : BaseFragment() {
         initUi()
         setupMovieDetails()
         checkIfFavorite()
+        loadReviews()
+        loadRatingSummary()
     }
 
     override fun onDestroyView() {
