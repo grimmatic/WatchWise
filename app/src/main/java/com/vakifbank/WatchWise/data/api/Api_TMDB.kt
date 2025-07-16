@@ -3,7 +3,7 @@ package com.vakifbank.WatchWise.data.api
 import com.vakifbank.WatchWise.domain.model.GetMoviesResponse
 import com.vakifbank.WatchWise.domain.model.MovieDetail
 import com.vakifbank.WatchWise.domain.model.MovieVideosResponse
-import com.vakifbank.WatchWise.ui.activity.Constant
+import com.vakifbank.WatchWise.utils.Constant
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
