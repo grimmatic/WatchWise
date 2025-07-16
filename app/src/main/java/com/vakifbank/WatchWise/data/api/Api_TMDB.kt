@@ -12,21 +12,21 @@ import retrofit2.http.Query
 interface ApiTMDB {
     @GET("movie/popular")
     fun getPopularMovies(
-        @Query("api_key") apiKey: String = Constant.ApiConstansts.TMDB_API_KEY,
+        @Query("api_key") apiKey: String = Constant.ApiConstants.TMDB_API_KEY,
         @Query("page") page: Int,
         @Query("language") language: String = "tr-TR"
     ): Call<GetMoviesResponse>
 
     @GET("movie/top_rated")
     fun getTopRatedMovies(
-        @Query("api_key") apiKey: String = Constant.ApiConstansts.TMDB_API_KEY,
+        @Query("api_key") apiKey: String = Constant.ApiConstants.TMDB_API_KEY,
         @Query("page") page: Int,
         @Query("language") language: String = "tr-TR"
     ): Call<GetMoviesResponse>
 
     @GET("movie/upcoming")
     fun getUpcomingMovies(
-        @Query("api_key") apiKey: String = Constant.ApiConstansts.TMDB_API_KEY,
+        @Query("api_key") apiKey: String = Constant.ApiConstants.TMDB_API_KEY,
         @Query("page") page: Int,
         @Query("language") language: String = "tr-TR"
     ): Call<GetMoviesResponse>
@@ -34,21 +34,21 @@ interface ApiTMDB {
     @GET("movie/{movie_id}")
     fun getMovieDetails(
         @Path("movie_id") movieId: Int?,
-        @Query("api_key") apiKey: String = Constant.ApiConstansts.TMDB_API_KEY,
+        @Query("api_key") apiKey: String = Constant.ApiConstants.TMDB_API_KEY,
         @Query("language") language: String = "tr-TR"
     ): Call<MovieDetail>
 
     @GET("movie/{movie_id}")
     fun getMovieDetailsInEnglish(
         @Path("movie_id") movieId: Int?,
-        @Query("api_key") apiKey: String = Constant.ApiConstansts.TMDB_API_KEY,
+        @Query("api_key") apiKey: String = Constant.ApiConstants.TMDB_API_KEY,
         @Query("language") language: String = "en-US"
     ): Call<MovieDetail>
 
 
     @GET("search/movie")
     fun searchMovies(
-        @Query("api_key") apiKey: String = Constant.ApiConstansts.TMDB_API_KEY,
+        @Query("api_key") apiKey: String = Constant.ApiConstants.TMDB_API_KEY,
         @Query("query") query: String,
         @Query("language") language: String = "tr-TR",
         @Query("page") page: Int = 1
@@ -57,7 +57,7 @@ interface ApiTMDB {
     @GET("movie/{movie_id}/videos")
     fun getMovieVideos(
         @Path("movie_id") movieId: Int,
-        @Query("api_key") apiKey: String = Constant.ApiConstansts.TMDB_API_KEY,
+        @Query("api_key") apiKey: String = Constant.ApiConstants.TMDB_API_KEY,
         @Query("language") language: String = "en-US"
     ): Call<MovieVideosResponse>
 
