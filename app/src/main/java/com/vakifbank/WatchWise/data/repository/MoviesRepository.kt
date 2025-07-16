@@ -1,7 +1,7 @@
 package com.vakifbank.WatchWise.data.repository
 
 import com.vakifbank.WatchWise.data.api.ApiTMDB
-import com.vakifbank.WatchWise.ui.activity.Constanst
+import com.vakifbank.WatchWise.ui.activity.Constant
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -10,7 +10,7 @@ object MoviesRepository {
 
     init {
         val retrofit = Retrofit.Builder()
-            .baseUrl(Constanst.ApiConstansts.TMBD_API_BASE_URL)
+            .baseUrl(Constant.ApiConstansts.TMBD_API_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
