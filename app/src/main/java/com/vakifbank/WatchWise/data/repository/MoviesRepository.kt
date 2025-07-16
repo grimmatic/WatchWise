@@ -10,7 +10,7 @@ object MoviesRepository {
 
     init {
         val retrofit = Retrofit.Builder()
-            .baseUrl(Constant.ApiConstansts.TMBD_API_BASE_URL)
+            .baseUrl(Constant.ApiConstants.TMBD_API_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
