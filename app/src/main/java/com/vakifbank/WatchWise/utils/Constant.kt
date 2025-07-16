@@ -1,4 +1,4 @@
-package com.vakifbank.WatchWise.ui.activity
+package com.vakifbank.WatchWise.utils
 
 class Constant {
     object ApiConstants{
