@@ -30,6 +30,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsInEnglishUseCase
+import com.vakifbank.WatchWise.domain.usecase.GetMovieVideosUseCase
 
 
 @AndroidEntryPoint
@@ -42,8 +43,8 @@ class MovieDetailFragment : BaseFragment() {
 
     @Inject
     lateinit var getMovieDetailsUseCase: GetMovieDetailsUseCase
-    @Inject
     lateinit var getMovieDetailsInEnglishUseCase: GetMovieDetailsInEnglishUseCase
+    lateinit var getMovieVideosUseCase: GetMovieVideosUseCase
 
     private var movieDetail: MovieDetail? = null
     private var trailerKey: String? = null
@@ -345,7 +346,7 @@ class MovieDetailFragment : BaseFragment() {
 
     private fun loadMovieTrailer(movieId: Int?) {
         movieId?.let { id ->
-            val call = getMovieDetailsUseCase(id) // Bu use case yerine video use case kullanılmalı
+            val call = getMovieVideosUseCase(id) // Bu use case yerine video use case kullanılmalı
             // Trailer loading logic burada implement edilecek
         }
     }
@@ -406,25 +407,7 @@ class MovieDetailFragment : BaseFragment() {
 
     private fun loadEnglishDescription(movieId: Int?) {
         movieId?.let { id ->
-            val call = getMovieDetailsInEnglishUseCase(id)
-            call.enqueue(object : Callback<MovieDetail> {
-                override fun onResponse(call: Call<MovieDetail>, response: Response<MovieDetail>) {
-                    if (response.isSuccessful) {
-                        response.body()?.description?.takeIf { it.isNotEmpty() }?.let { englishDescription ->
-                            binding.movieDescriptionTextView.text = englishDescription
-                            binding.movieDescriptionTextView.visibility = View.VISIBLE
-                        } ?: run {
-                            binding.movieDescriptionTextView.visibility = View.GONE
-                        }
-                    } else {
-                        binding.movieDescriptionTextView.visibility = View.GONE
-                    }
-                }
-
-                override fun onFailure(call: Call<MovieDetail>, t: Throwable) {
-                    binding.movieDescriptionTextView.visibility = View.GONE
-                }
-            })
+            viewModel.loadEnglishDescription(id)
         }
     }
 

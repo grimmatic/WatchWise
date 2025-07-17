@@ -1,18 +1,16 @@
 package com.vakifbank.WatchWise.ui.fragment.movielist
 
-import com.vakifbank.WatchWise.domain.usecase.GetUpcomingMoviesUseCase
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.vakifbank.WatchWise.domain.model.GetMoviesResponse
+import androidx.lifecycle.viewModelScope
 import com.vakifbank.WatchWise.domain.model.Movie
 import com.vakifbank.WatchWise.domain.usecase.GetPopularMoviesUseCase
 import com.vakifbank.WatchWise.domain.usecase.GetTopRatedMoviesUseCase
+import com.vakifbank.WatchWise.domain.usecase.GetUpcomingMoviesUseCase
 import com.vakifbank.WatchWise.domain.usecase.SearchMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,60 +40,45 @@ class MovieListViewModel @Inject constructor(
     val error: LiveData<String?> = _error
 
     fun loadPopularMovies(page: Int = 1) {
-        _isLoading.value = true
-        getPopularMoviesUseCase(page).enqueue(object : Callback<GetMoviesResponse> {
-            override fun onResponse(call: Call<GetMoviesResponse>, response: Response<GetMoviesResponse>) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                val response = getPopularMoviesUseCase(page)
+                _popularMovies.value = response.movies ?: emptyList()
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to load popular movies"
+            } finally {
                 _isLoading.value = false
-                if (response.isSuccessful) {
-                    _popularMovies.value = response.body()?.movies ?: emptyList()
-                } else {
-                    _error.value = "Failed to load popular movies"
-                }
             }
-
-            override fun onFailure(call: Call<GetMoviesResponse>, t: Throwable) {
-                _isLoading.value = false
-                _error.value = t.message
-            }
-        })
+        }
     }
 
     fun loadTopRatedMovies(page: Int = 1) {
-        _isLoading.value = true
-        getTopRatedMoviesUseCase(page).enqueue(object : Callback<GetMoviesResponse> {
-            override fun onResponse(call: Call<GetMoviesResponse>, response: Response<GetMoviesResponse>) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                val response = getTopRatedMoviesUseCase(page)
+                _topRatedMovies.value = response.movies ?: emptyList()
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to load top rated movies"
+            } finally {
                 _isLoading.value = false
-                if (response.isSuccessful) {
-                    _topRatedMovies.value = response.body()?.movies ?: emptyList()
-                } else {
-                    _error.value = "Failed to load top rated movies"
-                }
             }
-
-            override fun onFailure(call: Call<GetMoviesResponse>, t: Throwable) {
-                _isLoading.value = false
-                _error.value = t.message
-            }
-        })
+        }
     }
 
     fun loadUpcomingMovies(page: Int = 1) {
-        _isLoading.value = true
-        GetUpcomingMoviesUseCase(page).enqueue(object : Callback<GetMoviesResponse> {
-            override fun onResponse(call: Call<GetMoviesResponse>, response: Response<GetMoviesResponse>) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                val response = getUpcomingMoviesUseCase(page)
+                _upcomingMovies.value = response.movies ?: emptyList()
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to load upcoming movies"
+            } finally {
                 _isLoading.value = false
-                if (response.isSuccessful) {
-                    _upcomingMovies.value = response.body()?.movies ?: emptyList()
-                } else {
-                    _error.value = "Failed to load upcoming movies"
-                }
             }
-
-            override fun onFailure(call: Call<GetMoviesResponse>, t: Throwable) {
-                _isLoading.value = false
-                _error.value = t.message
-            }
-        })
+        }
     }
 
     fun searchMovies(query: String) {
@@ -104,19 +87,14 @@ class MovieListViewModel @Inject constructor(
             return
         }
 
-        searchMoviesUseCase(query).enqueue(object : Callback<GetMoviesResponse> {
-            override fun onResponse(call: Call<GetMoviesResponse>, response: Response<GetMoviesResponse>) {
-                if (response.isSuccessful) {
-                    _searchResults.value = response.body()?.movies ?: emptyList()
-                } else {
-                    _error.value = "Search failed"
-                }
+        viewModelScope.launch {
+            try {
+                val response = searchMoviesUseCase(query)
+                _searchResults.value = response.movies ?: emptyList()
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Search failed"
             }
-
-            override fun onFailure(call: Call<GetMoviesResponse>, t: Throwable) {
-                _error.value = t.message
-            }
-        })
+        }
     }
 
     fun loadAllMovies() {

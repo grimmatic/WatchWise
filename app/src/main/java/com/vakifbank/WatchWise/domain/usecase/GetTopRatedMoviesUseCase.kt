@@ -2,13 +2,12 @@ package com.vakifbank.WatchWise.domain.usecase
 
 import com.vakifbank.WatchWise.domain.model.GetMoviesResponse
 import com.vakifbank.WatchWise.domain.repository.MovieRepository
-import retrofit2.Call
 import javax.inject.Inject
 
 class GetTopRatedMoviesUseCase @Inject constructor(
     private val movieRepository: MovieRepository
 ) {
-    operator fun invoke(page: Int): Call<GetMoviesResponse> {
+    suspend operator fun invoke(page: Int): GetMoviesResponse {
         return movieRepository.getTopRatedMovies(page)
     }
 }

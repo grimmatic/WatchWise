@@ -31,19 +31,18 @@ interface ApiTMDB {
     ): GetMoviesResponse
 
     @GET("movie/{movie_id}")
-    suspend  fun getMovieDetails(
+    suspend fun getMovieDetails(
         @Path("movie_id") movieId: Int?,
         @Query("api_key") apiKey: String = Constant.ApiConstants.TMDB_API_KEY,
         @Query("language") language: String = "tr-TR"
     ): MovieDetail
 
     @GET("movie/{movie_id}")
-    suspend  fun getMovieDetailsInEnglish(
+    suspend fun getMovieDetailsInEnglish(
         @Path("movie_id") movieId: Int?,
         @Query("api_key") apiKey: String = Constant.ApiConstants.TMDB_API_KEY,
         @Query("language") language: String = "en-US"
     ): MovieDetail
-
 
     @GET("search/movie")
     suspend fun searchMovies(
@@ -59,5 +58,4 @@ interface ApiTMDB {
         @Query("api_key") apiKey: String = Constant.ApiConstants.TMDB_API_KEY,
         @Query("language") language: String = "en-US"
     ): MovieVideosResponse
-
 }
