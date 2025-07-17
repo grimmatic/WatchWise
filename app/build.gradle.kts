@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
     id ("kotlin-parcelize")
+    id("kotlin-kapt")
+
 }
 android {
     namespace = "com.vakifbank.WatchWise"
@@ -71,6 +73,10 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("com.google.dagger:hilt-android:2.48")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+    kapt("com.google.dagger:hilt-compiler:2.48")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

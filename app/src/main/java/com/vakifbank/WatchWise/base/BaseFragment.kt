@@ -1,5 +1,6 @@
-package com.vakifbank.WatchWise.ui.fragment
+package com.vakifbank.WatchWise.base
 
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -13,12 +14,12 @@ abstract class BaseFragment : Fragment() {
 
         favoriteButton?.let { fab ->
             if (auth.currentUser != null) {
-                fab.visibility = android.view.View.VISIBLE
+                fab.visibility = View.VISIBLE
                 fab.setOnClickListener {
                     findNavController().navigate(R.id.favoriteFragment)
                 }
             } else
-                fab.visibility = android.view.View.GONE
+                fab.visibility = View.GONE
 
         }
     }

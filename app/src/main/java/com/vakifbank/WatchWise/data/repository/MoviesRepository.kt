@@ -1,6 +1,6 @@
 package com.vakifbank.WatchWise.data.repository
 
-import com.vakifbank.WatchWise.data.api.ApiTMDB
+import com.vakifbank.WatchWise.data.service.ApiTMDB
 import com.vakifbank.WatchWise.utils.Constant
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

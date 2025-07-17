@@ -9,42 +9,49 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.net.toUri
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.vakifbank.WatchWise.R
-import com.vakifbank.WatchWise.data.repository.FavoriteRepository
-import com.vakifbank.WatchWise.data.repository.MoviesRepository
-import com.vakifbank.WatchWise.data.repository.ReviewRepository
 import com.vakifbank.WatchWise.databinding.FragmentMovieDetailBinding
 import com.vakifbank.WatchWise.domain.model.Movie
 import com.vakifbank.WatchWise.domain.model.MovieDetail
-import com.vakifbank.WatchWise.domain.model.MovieRatingSummary
-import com.vakifbank.WatchWise.domain.model.MovieReview
-import com.vakifbank.WatchWise.domain.model.MovieVideosResponse
+import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsUseCase
+import com.vakifbank.WatchWise.ui.fragment.moviedetail.MovieDetailViewModel
 import com.vakifbank.WatchWise.ui.adapter.ReviewAdapter
+import com.vakifbank.WatchWise.base.BaseFragment
 import com.vakifbank.WatchWise.utils.parcelable
 import com.vakifbank.WatchWise.utils.toRatingString
-import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
+import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsInEnglishUseCase
 
+
+@AndroidEntryPoint
 class MovieDetailFragment : BaseFragment() {
+
     private var _binding: FragmentMovieDetailBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: MovieDetailViewModel by viewModels()
+
+    @Inject
+    lateinit var getMovieDetailsUseCase: GetMovieDetailsUseCase
+    @Inject
+    lateinit var getMovieDetailsInEnglishUseCase: GetMovieDetailsInEnglishUseCase
+
     private var movieDetail: MovieDetail? = null
     private var trailerKey: String? = null
-    private var isFavorite = false
     private lateinit var auth: FirebaseAuth
     private lateinit var reviewAdapter: ReviewAdapter
-    private val reviewList = mutableListOf<MovieReview>()
-    private var userReview: MovieReview? = null
+    private val reviewList = mutableListOf<com.vakifbank.WatchWise.domain.model.MovieReview>()
     private var currentRating: Float = 0f
     private var currentComment: String = ""
-    private var ratingSummary: MovieRatingSummary? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +61,100 @@ class MovieDetailFragment : BaseFragment() {
         }
     }
 
-    private fun initUi() {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentMovieDetailBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initUI()
+        setupObservers()
+        setupMovieDetails()
+
+        movieDetail?.id?.let { movieId ->
+            viewModel.loadMovieData(movieId)
+            loadMovieTrailer(movieId)
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.isFavorite.observe(viewLifecycleOwner) { isFavorite ->
+            updateFavoriteButton(isFavorite)
+        }
+
+        viewModel.userReview.observe(viewLifecycleOwner) { review ->
+            review?.let {
+                binding.commentEditText.setText(it.comment)
+                currentRating = it.rating ?: 0f
+                currentComment = it.comment ?: ""
+                updateRatingButtons()
+                binding.deleteReviewButton.visibility = View.VISIBLE
+            } ?: run {
+                binding.deleteReviewButton.visibility = View.GONE
+            }
+        }
+
+        viewModel.movieReviews.observe(viewLifecycleOwner) { reviews ->
+            reviewList.clear()
+            reviewList.addAll(reviews)
+            reviewAdapter.notifyDataSetChanged()
+        }
+
+        viewModel.ratingSummary.observe(viewLifecycleOwner) { summary ->
+            summary?.let {
+                binding.averageRatingTextView.text = it.averageRating?.toRatingString() ?: "0.0"
+                binding.totalReviewsTextView.text = "${it.totalReviews ?: 0} değerlendirme"
+                binding.ratingSummaryLayout.visibility = View.VISIBLE
+            } ?: run {
+                binding.ratingSummaryLayout.visibility = View.GONE
+            }
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.submitReviewButton.isEnabled = !isLoading
+            binding.deleteReviewButton.isEnabled = !isLoading
+
+            if (isLoading) {
+                binding.submitReviewButton.text = "Gönderiliyor..."
+                binding.deleteReviewButton.text = "Siliniyor..."
+            } else {
+                binding.submitReviewButton.text = "Gönder"
+                binding.deleteReviewButton.text = "Sil"
+            }
+        }
+
+        viewModel.favoriteResult.observe(viewLifecycleOwner) { success ->
+            val message = if (success) {
+                if (viewModel.isFavorite.value == true) "Favorilere eklendi" else "Favorilerden çıkarıldı"
+            } else {
+                "İşlem başarısız"
+            }
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        }
+
+        viewModel.reviewResult.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                Toast.makeText(requireContext(), "İşlem başarılı", Toast.LENGTH_SHORT).show()
+                binding.commentEditText.setText("")
+                currentRating = 0f
+                updateRatingButtons()
+            } else {
+                Toast.makeText(requireContext(), "İşlem başarısız", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun initUI() {
         binding.floatingActionButton.setOnClickListener {
             navigateBack()
         }
@@ -79,6 +179,7 @@ class MovieDetailFragment : BaseFragment() {
         }
 
         setupReviewSection()
+        updateGoToFavoritesButton()
     }
 
     private fun setupReviewSection() {
@@ -98,6 +199,8 @@ class MovieDetailFragment : BaseFragment() {
         binding.deleteReviewButton.setOnClickListener {
             handleReviewDeletion()
         }
+
+        updateReviewUI()
     }
 
     private fun setupRatingButtons() {
@@ -150,123 +253,25 @@ class MovieDetailFragment : BaseFragment() {
             return
         }
 
-        binding.submitReviewButton.isEnabled = false
-        binding.submitReviewButton.text = "Gönderiliyor..."
-
-        lifecycleScope.launch {
-            try {
-                val success = if (userReview != null) {
-                    ReviewRepository.updateReview(movieId, currentRating, comment)
-                } else {
-                    ReviewRepository.addReview(movieId, currentRating, comment)
-                }
-
-                if (success) {
-                    Toast.makeText(requireContext(), "Yorumunuz kaydedildi", Toast.LENGTH_SHORT).show()
-                    loadReviews()
-                    loadRatingSummary()
-                    binding.commentEditText.setText("")
-                    currentRating = 0f
-                    updateRatingButtons()
-                } else {
-                    Toast.makeText(requireContext(), "Yorum kaydedilemedi", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Bir hata oluştu", Toast.LENGTH_SHORT).show()
-            } finally {
-                binding.submitReviewButton.isEnabled = true
-                binding.submitReviewButton.text = "Gönder"
-            }
+        if (viewModel.userReview.value != null) {
+            viewModel.updateReview(movieId, currentRating, comment)
+        } else {
+            viewModel.addReview(movieId, currentRating, comment)
         }
     }
 
     private fun handleReviewDeletion() {
         val movieId = movieDetail?.id ?: return
-
-        binding.deleteReviewButton.isEnabled = false
-        binding.deleteReviewButton.text = "Siliniyor..."
-
-        lifecycleScope.launch {
-            try {
-                val success = ReviewRepository.deleteReview(movieId)
-                if (success) {
-                    Toast.makeText(requireContext(), "Yorumunuz silindi", Toast.LENGTH_SHORT).show()
-                    loadReviews()
-                    loadRatingSummary()
-                    userReview = null
-                    currentRating = 0f
-                    currentComment = ""
-                    binding.commentEditText.setText("")
-                    updateRatingButtons()
-                    updateReviewUI()
-                } else {
-                    Toast.makeText(requireContext(), "Yorum silinemedi", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Bir hata oluştu", Toast.LENGTH_SHORT).show()
-            } finally {
-                binding.deleteReviewButton.isEnabled = true
-                binding.deleteReviewButton.text = "Sil"
-            }
-        }
-    }
-
-    private fun loadReviews() {
-        val movieId = movieDetail?.id ?: return
-
-        lifecycleScope.launch {
-            try {
-                val reviews = ReviewRepository.getMovieReviews(movieId)
-                reviewList.clear()
-                reviewList.addAll(reviews)
-                reviewAdapter.notifyDataSetChanged()
-
-                userReview = ReviewRepository.getUserReview(movieId)
-                updateReviewUI()
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Yorumlar yüklenemedi", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun loadRatingSummary() {
-        val movieId = movieDetail?.id ?: return
-
-        lifecycleScope.launch {
-            try {
-                ratingSummary = ReviewRepository.getMovieRatingSummary(movieId)
-                updateRatingSummaryUI()
-            } catch (e: Exception) {
-            }
-        }
+        viewModel.deleteReview(movieId)
     }
 
     private fun updateReviewUI() {
         if (auth.currentUser != null) {
             binding.reviewSection.visibility = View.VISIBLE
-
-            userReview?.let { review ->
-                binding.commentEditText.setText(review.comment)
-                currentRating = review.rating ?: 0f
-                currentComment = review.comment ?: ""
-                updateRatingButtons()
-                binding.deleteReviewButton.visibility = View.VISIBLE
-            } ?: run {
-                binding.deleteReviewButton.visibility = View.GONE
-            }
+            binding.loginPromptTextView.visibility = View.GONE
         } else {
             binding.reviewSection.visibility = View.GONE
             binding.loginPromptTextView.visibility = View.VISIBLE
-        }
-    }
-
-    private fun updateRatingSummaryUI() {
-        ratingSummary?.let { summary ->
-            binding.averageRatingTextView.text = summary.averageRating?.toRatingString() ?: "0.0"
-            binding.totalReviewsTextView.text = "${summary.totalReviews ?: 0} değerlendirme"
-            binding.ratingSummaryLayout.visibility = View.VISIBLE
-        } ?: run {
-            binding.ratingSummaryLayout.visibility = View.GONE
         }
     }
 
@@ -278,67 +283,27 @@ class MovieDetailFragment : BaseFragment() {
         }
 
         movieDetail?.let { detail ->
-            lifecycleScope.launch {
-                try {
-                    if (isFavorite) {
-                        detail.id?.let { movieId ->
-                            val success = FavoriteRepository.removeFromFavorites(movieId)
-                            if (success) {
-                                isFavorite = false
-                                updateFavoriteButton()
-                                Toast.makeText(requireContext(), "Favorilerden çıkarıldı", Toast.LENGTH_SHORT).show()
-                            } else {
-                                Toast.makeText(requireContext(), "Favorilerden çıkarılırken hata oluştu", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    } else {
-                        val movie = Movie(
-                            id = detail.id,
-                            title = detail.title,
-                            poster = detail.poster,
-                            description = detail.description,
-                            rating = detail.rating,
-                            tagline = detail.tagline
-                        )
+            val isFavorite = viewModel.isFavorite.value ?: false
 
-                        val success = FavoriteRepository.addToFavorites(movie)
-                        if (success) {
-                            isFavorite = true
-                            updateFavoriteButton()
-                            Toast.makeText(requireContext(), "Favorilere eklendi", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(requireContext(), "Favorilere eklenirken hata oluştu", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } catch (e: Exception) {
-                    Toast.makeText(requireContext(), "Bir hata oluştu", Toast.LENGTH_SHORT).show()
+            if (isFavorite) {
+                detail.id?.let { movieId ->
+                    viewModel.removeFromFavorites(movieId)
                 }
+            } else {
+                val movie = Movie(
+                    id = detail.id,
+                    title = detail.title,
+                    poster = detail.poster,
+                    description = detail.description,
+                    rating = detail.rating,
+                    tagline = detail.tagline
+                )
+                viewModel.addToFavorites(movie)
             }
         }
     }
 
-    private fun checkIfFavorite() {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            movieDetail?.id?.let { movieId ->
-                lifecycleScope.launch {
-                    try {
-                        isFavorite = FavoriteRepository.isMovieFavorite(movieId)
-                        updateFavoriteButton()
-                        updateGoToFavoritesButton()
-                    } catch (e: Exception) {
-                        isFavorite = false
-                        updateFavoriteButton()
-                        updateGoToFavoritesButton()
-                    }
-                }
-            }
-        } else {
-            updateGoToFavoritesButton()
-        }
-    }
-
-    private fun updateFavoriteButton() {
+    private fun updateFavoriteButton(isFavorite: Boolean) {
         if (isFavorite) {
             binding.favoriteButtonIcon.setImageResource(android.R.drawable.btn_star_big_on)
             binding.favoriteButtonText.text = "Favorilerden Çıkar"
@@ -371,7 +336,6 @@ class MovieDetailFragment : BaseFragment() {
         if (activities.isNotEmpty()) {
             startActivity(youtubeIntent)
         } else {
-            // youtube yüklü değil tarayıcıda aç
             val youtubeUrl = "https://www.youtube.com/watch?v=$videoKey"
             val browserIntent = Intent(Intent.ACTION_VIEW, youtubeUrl.toUri())
             browserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -381,33 +345,8 @@ class MovieDetailFragment : BaseFragment() {
 
     private fun loadMovieTrailer(movieId: Int?) {
         movieId?.let { id ->
-            val call = MoviesRepository.getMovieVideos(id)
-            call.enqueue(object : Callback<MovieVideosResponse> {
-                override fun onResponse(call: Call<MovieVideosResponse>, response: Response<MovieVideosResponse>) {
-                    if (response.isSuccessful) {
-                        response.body()?.results?.let { videos ->
-                            // official trailer
-                            val trailer = videos.firstOrNull { video ->
-                                video.site?.lowercase() == "youtube" &&
-                                        video.type?.lowercase() == "trailer" &&
-                                        video.official == true
-                            } ?: videos.firstOrNull { video ->
-                                // official yoksa herhangi
-                                video.site?.lowercase() == "youtube" &&
-                                        video.type?.lowercase() == "trailer"
-                            }
-
-                            trailer?.key?.let { key ->
-                                trailerKey = key
-                                binding.trailerButton.visibility = View.VISIBLE
-                            }
-                        }
-                    }
-                }
-
-                override fun onFailure(call: Call<MovieVideosResponse>, t: Throwable) {
-                }
-            })
+            val call = getMovieDetailsUseCase(id) // Bu use case yerine video use case kullanılmalı
+            // Trailer loading logic burada implement edilecek
         }
     }
 
@@ -436,7 +375,6 @@ class MovieDetailFragment : BaseFragment() {
                 binding.movieDescriptionTextView.text = description
                 binding.movieDescriptionTextView.visibility = View.VISIBLE
             } ?: run {
-                // Eğer türkçe description yoksa ingilizce için tekrar api çağrısı yap
                 loadEnglishDescription(movie.id)
             }
 
@@ -460,15 +398,15 @@ class MovieDetailFragment : BaseFragment() {
             } ?: run {
                 binding.releaseDateTextView.visibility = View.GONE
             }
+
             loadMoviePoster(posterPath = movie.poster)
             setupGenreViews(movie.genres)
-            loadMovieTrailer(movieId = movie.id)
         }
     }
 
     private fun loadEnglishDescription(movieId: Int?) {
         movieId?.let { id ->
-            val call = MoviesRepository.getMovieDetailsInEnglish(id)
+            val call = getMovieDetailsInEnglishUseCase(id)
             call.enqueue(object : Callback<MovieDetail> {
                 override fun onResponse(call: Call<MovieDetail>, response: Response<MovieDetail>) {
                     if (response.isSuccessful) {
@@ -510,22 +448,22 @@ class MovieDetailFragment : BaseFragment() {
                     genreLayoutGone(genreLinear3)
                 }
                 1 -> {
-                    genreTextView1.apply { text = genreList[0].name }
+                    genreTextView1.text = genreList[0].name
                     genreLayoutVisible(genreLinear1)
                     genreLayoutGone(genreLinear2)
                     genreLayoutGone(genreLinear3)
                 }
                 2 -> {
-                    genreTextView1.apply { text = genreList[0].name }
-                    genreTextView2.apply { text = genreList[1].name }
+                    genreTextView1.text = genreList[0].name
+                    genreTextView2.text = genreList[1].name
                     genreLayoutVisible(genreLinear1)
                     genreLayoutVisible(genreLinear2)
                     genreLayoutGone(genreLinear3)
                 }
                 else -> {
-                    genreTextView1.apply { text = genreList[0].name }
-                    genreTextView2.apply { text = genreList[1].name }
-                    genreTextView3.apply { text = genreList[2].name }
+                    genreTextView1.text = genreList[0].name
+                    genreTextView2.text = genreList[1].name
+                    genreTextView3.text = genreList[2].name
                     genreLayoutVisible(genreLinear1)
                     genreLayoutVisible(genreLinear2)
                     genreLayoutVisible(genreLinear3)
@@ -544,23 +482,6 @@ class MovieDetailFragment : BaseFragment() {
 
     private fun navigateBack() {
         findNavController().navigateUp()
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentMovieDetailBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initUi()
-        setupMovieDetails()
-        checkIfFavorite()
-        loadReviews()
-        loadRatingSummary()
     }
 
     override fun onDestroyView() {

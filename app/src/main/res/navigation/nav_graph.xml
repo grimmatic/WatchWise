@@ -36,7 +36,7 @@
 
     <fragment
         android:id="@+id/MovieListFragment"
-        android:name="com.vakifbank.WatchWise.ui.fragment.MovieListFragment"
+        android:name="com.vakifbank.WatchWise.ui.fragment.movielist.MovieListFragment"
         android:label="MovieListFragment"
         tools:layout="@layout/fragment_movie_list" >
         <action
@@ -57,7 +57,7 @@
 
     <fragment
         android:id="@+id/movieDetailFragment"
-        android:name="com.vakifbank.WatchWise.ui.fragment.MovieDetailFragment"
+        android:name="com.vakifbank.WatchWise.ui.fragment.moviedetail.MovieDetailFragment"
         android:label="fragment_movie_detail"
         tools:layout="@layout/fragment_movie_detail" >
         <argument
@@ -92,7 +92,7 @@
 
     <fragment
         android:id="@+id/favoriteFragment"
-        android:name="com.vakifbank.WatchWise.ui.fragment.FavoriteFragment"
+        android:name="com.vakifbank.WatchWise.ui.fragment.favorite.FavoriteFragment"
         android:label="fragment_favorite"
         tools:layout="@layout/fragment_favorite" >
         <action

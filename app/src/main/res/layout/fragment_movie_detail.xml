@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/list_gradient_backgorund"
-    tools:context=".ui.fragment.MovieDetailFragment">
+    tools:context=".ui.fragment.moviedetail.MovieDetailFragment">
 
     <ScrollView
         android:layout_width="match_parent"
