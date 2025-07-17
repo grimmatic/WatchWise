@@ -17,7 +17,7 @@
         android:layout_width="120dp"
         android:layout_height="160dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_launcher_background"/>
+        android:src="@drawable/ic_launcher_background" />
 
     <TextView
         android:id="@+id/filmTitle"
@@ -34,5 +34,5 @@
         android:shadowColor="@color/black"
         android:shadowDx="1"
         android:shadowDy="1"
-        android:shadowRadius="3"/>
+        android:shadowRadius="3" />
 </LinearLayout>

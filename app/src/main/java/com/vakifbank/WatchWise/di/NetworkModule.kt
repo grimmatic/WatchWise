@@ -33,6 +33,7 @@ object NetworkModule {
     fun provideApiTMDB(retrofit: Retrofit): ApiTMDB {
         return retrofit.create(ApiTMDB::class.java)
     }
+
     @Singleton
     @Provides
     fun provideRestOkHttpClient(): OkHttpClient {

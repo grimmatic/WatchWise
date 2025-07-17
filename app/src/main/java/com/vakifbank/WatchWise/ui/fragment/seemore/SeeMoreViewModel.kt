@@ -5,10 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vakifbank.WatchWise.domain.model.Movie
+import com.vakifbank.WatchWise.domain.model.MovieDetail
+import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsUseCase
 import com.vakifbank.WatchWise.domain.usecase.GetPopularMoviesUseCase
 import com.vakifbank.WatchWise.domain.usecase.GetTopRatedMoviesUseCase
 import com.vakifbank.WatchWise.domain.usecase.GetUpcomingMoviesUseCase
-import com.vakifbank.WatchWise.ui.fragment.MovieCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,7 +18,8 @@ import javax.inject.Inject
 class SeeMoreViewModel @Inject constructor(
     private val getPopularMoviesUseCase: GetPopularMoviesUseCase,
     private val getTopRatedMoviesUseCase: GetTopRatedMoviesUseCase,
-    private val getUpcomingMoviesUseCase: GetUpcomingMoviesUseCase
+    private val getUpcomingMoviesUseCase: GetUpcomingMoviesUseCase,
+    private val getMovieDetailsUseCase: GetMovieDetailsUseCase
 ) : ViewModel() {
 
     private val _movies = MutableLiveData<List<Movie>>()
@@ -71,6 +73,17 @@ class SeeMoreViewModel @Inject constructor(
                 _error.value = e.message ?: "Bilinmeyen hata"
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    fun loadMovieDetailsForNavigation(movieId: Int?, onSuccess: (MovieDetail) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val movieDetail = getMovieDetailsUseCase(movieId)
+                onSuccess(movieDetail)
+            } catch (e: Exception) {
+                _error.value = "Film detayları yüklenemedi"
             }
         }
     }

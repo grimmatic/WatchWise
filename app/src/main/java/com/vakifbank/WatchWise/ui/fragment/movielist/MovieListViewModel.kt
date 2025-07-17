@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vakifbank.WatchWise.domain.model.Movie
+import com.vakifbank.WatchWise.domain.model.MovieDetail
+import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsUseCase
 import com.vakifbank.WatchWise.domain.usecase.GetPopularMoviesUseCase
 import com.vakifbank.WatchWise.domain.usecase.GetTopRatedMoviesUseCase
 import com.vakifbank.WatchWise.domain.usecase.GetUpcomingMoviesUseCase
@@ -18,8 +20,10 @@ class MovieListViewModel @Inject constructor(
     private val getPopularMoviesUseCase: GetPopularMoviesUseCase,
     private val getTopRatedMoviesUseCase: GetTopRatedMoviesUseCase,
     private val getUpcomingMoviesUseCase: GetUpcomingMoviesUseCase,
-    private val searchMoviesUseCase: SearchMoviesUseCase
+    private val searchMoviesUseCase: SearchMoviesUseCase,
+    private val getMovieDetailsUseCase: GetMovieDetailsUseCase
 ) : ViewModel() {
+
 
     private val _popularMovies = MutableLiveData<List<Movie>>()
     val popularMovies: LiveData<List<Movie>> = _popularMovies
@@ -93,6 +97,17 @@ class MovieListViewModel @Inject constructor(
                 _searchResults.value = response.movies ?: emptyList()
             } catch (e: Exception) {
                 _error.value = e.message ?: "Search failed"
+            }
+        }
+    }
+
+    fun loadMovieDetailsForNavigation(movieId: Int?, onSuccess: (MovieDetail) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val movieDetail = getMovieDetailsUseCase(movieId)
+                onSuccess(movieDetail)
+            } catch (e: Exception) {
+                _error.value = "Film detayları yüklenemedi"
             }
         }
     }

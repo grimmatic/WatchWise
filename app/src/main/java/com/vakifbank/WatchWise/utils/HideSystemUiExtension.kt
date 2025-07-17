@@ -9,7 +9,7 @@ fun Activity.hideSystemUI() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         window.insetsController?.let {
             it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-         //   window.navigationBarColor = getColor(R.color.internal_black_semitransparent_light)
+            //   window.navigationBarColor = getColor(R.color.internal_black_semitransparent_light)
             it.hide(WindowInsets.Type.systemBars())
         }
     } else {
