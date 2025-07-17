@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vakifbank.WatchWise.base.BaseViewModel
 import com.vakifbank.WatchWise.domain.model.Movie
 import com.vakifbank.WatchWise.domain.model.MovieDetail
 import com.vakifbank.WatchWise.domain.usecase.GetFavoriteMoviesUseCase
@@ -16,7 +17,7 @@ import javax.inject.Inject
 class FavoriteViewModel @Inject constructor(
     private val getFavoriteMoviesUseCase: GetFavoriteMoviesUseCase,
     private val getMovieDetailsUseCase: GetMovieDetailsUseCase
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _favoriteMovies = MutableLiveData<List<Movie>>()
     val favoriteMovies: LiveData<List<Movie>> = _favoriteMovies
