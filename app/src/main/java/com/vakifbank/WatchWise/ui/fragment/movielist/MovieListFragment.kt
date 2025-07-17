@@ -23,6 +23,8 @@ import com.vakifbank.WatchWise.ui.adapter.MovieListType
 import com.vakifbank.WatchWise.ui.adapter.SearchMovieAdapter
 import com.vakifbank.WatchWise.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -236,23 +238,17 @@ class MovieListFragment : BaseFragment() {
             return
         }
 
-        val call = getMovieDetailsUseCase(movie.id)
-        call.enqueue(object : Callback<MovieDetail> {
-            override fun onResponse(call: Call<MovieDetail>, response: Response<MovieDetail>) {
-                if (response.isSuccessful) {
-                    response.body()?.let { movieDetail ->
-                        val bundle = Bundle().apply {
-                            putParcelable("movie_detail_data", movieDetail)
-                        }
-                        findNavController().navigate(R.id.action_MovieListFragment_to_movieDetailFragment, bundle)
-                    }
+        lifecycleScope.launch {
+            try {
+                val movieDetail = getMovieDetailsUseCase(movie.id)
+                val bundle = Bundle().apply {
+                    putParcelable("movie_detail_data", movieDetail)
                 }
-            }
-
-            override fun onFailure(call: Call<MovieDetail>, t: Throwable) {
+                findNavController().navigate(R.id.action_MovieListFragment_to_movieDetailFragment, bundle)
+            } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Film detayları yüklenemedi", Toast.LENGTH_SHORT).show()
             }
-        })
+        }
     }
 
     override fun onResume() {

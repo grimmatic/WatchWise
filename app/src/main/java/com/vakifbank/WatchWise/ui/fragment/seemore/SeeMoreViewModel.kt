@@ -3,16 +3,14 @@ package com.vakifbank.WatchWise.ui.fragment.seemore
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.vakifbank.WatchWise.domain.model.GetMoviesResponse
+import androidx.lifecycle.viewModelScope
 import com.vakifbank.WatchWise.domain.model.Movie
 import com.vakifbank.WatchWise.domain.usecase.GetPopularMoviesUseCase
 import com.vakifbank.WatchWise.domain.usecase.GetTopRatedMoviesUseCase
 import com.vakifbank.WatchWise.domain.usecase.GetUpcomingMoviesUseCase
 import com.vakifbank.WatchWise.ui.fragment.MovieCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -49,43 +47,32 @@ class SeeMoreViewModel @Inject constructor(
     fun loadMovies(page: Int) {
         if (_isLoading.value == true) return
 
-        _isLoading.value = true
-        currentPage = page
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                currentPage = page
 
-        val call = when(categoryType) {
-            MovieCategory.POPULAR -> getPopularMoviesUseCase(page)
-            MovieCategory.TOP_RATED -> getTopRatedMoviesUseCase(page)
-            MovieCategory.UPCOMING -> getUpcomingMoviesUseCase(page)
-        }
-
-        call.enqueue(object : Callback<GetMoviesResponse> {
-            override fun onResponse(call: Call<GetMoviesResponse>, response: Response<GetMoviesResponse>) {
-                _isLoading.value = false
-
-                if (response.isSuccessful) {
-                    val moviesResponse = response.body()
-                    moviesResponse?.let {
-                        totalPages = it.totalPages ?: 1
-                        it.movies?.let { newMovies ->
-                            if (page == 1) {
-                                currentMovieList.clear()
-                            }
-                            currentMovieList.addAll(newMovies)
-                            _movies.value = currentMovieList.toList()
-
-                            _hasMorePages.value = currentPage < totalPages
-                        }
-                    }
-                } else {
-                    _error.value = "Filmler yüklenirken hata oluştu"
+                val response = when (categoryType) {
+                    MovieCategory.POPULAR -> getPopularMoviesUseCase(page)
+                    MovieCategory.TOP_RATED -> getTopRatedMoviesUseCase(page)
+                    MovieCategory.UPCOMING -> getUpcomingMoviesUseCase(page)
                 }
-            }
 
-            override fun onFailure(call: Call<GetMoviesResponse>, t: Throwable) {
+                totalPages = response.totalPages ?: 1
+                response.movies?.let { newMovies ->
+                    if (page == 1) {
+                        currentMovieList.clear()
+                    }
+                    currentMovieList.addAll(newMovies)
+                    _movies.value = currentMovieList.toList()
+                    _hasMorePages.value = currentPage < totalPages
+                }
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Bilinmeyen hata"
+            } finally {
                 _isLoading.value = false
-                _error.value = t.message ?: "Bilinmeyen hata"
             }
-        })
+        }
     }
 
     fun loadNextPage() {

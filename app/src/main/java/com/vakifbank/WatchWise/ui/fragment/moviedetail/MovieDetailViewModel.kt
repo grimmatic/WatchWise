@@ -190,6 +190,17 @@ class MovieDetailViewModel @Inject constructor(
         }
     }
 
+    fun loadEnglishDescription(movieId: Int) {
+        viewModelScope.launch {
+            try {
+                val movieDetail = getMovieDetailsInEnglishUseCase(movieId)
+                _englishDescription.value = movieDetail.description
+            } catch (e: Exception) {
+                _englishDescription.value = ""
+            }
+        }
+    }
+
     fun loadMovieData(movieId: Int) {
         checkIfFavorite(movieId)
         loadUserReview(movieId)
