@@ -5,14 +5,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vakifbank.WatchWise.domain.model.Movie
+import com.vakifbank.WatchWise.domain.model.MovieDetail
 import com.vakifbank.WatchWise.domain.usecase.GetFavoriteMoviesUseCase
+import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FavoriteViewModel @Inject constructor(
-    private val getFavoriteMoviesUseCase: GetFavoriteMoviesUseCase
+    private val getFavoriteMoviesUseCase: GetFavoriteMoviesUseCase,
+    private val getMovieDetailsUseCase: GetMovieDetailsUseCase
 ) : ViewModel() {
 
     private val _favoriteMovies = MutableLiveData<List<Movie>>()
@@ -40,6 +43,17 @@ class FavoriteViewModel @Inject constructor(
                 _isEmpty.value = true
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    fun loadMovieDetailsForNavigation(movieId: Int?, onSuccess: (MovieDetail) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val movieDetail = getMovieDetailsUseCase(movieId)
+                onSuccess(movieDetail)
+            } catch (e: Exception) {
+                _error.value = "Film detayları yüklenemedi"
             }
         }
     }

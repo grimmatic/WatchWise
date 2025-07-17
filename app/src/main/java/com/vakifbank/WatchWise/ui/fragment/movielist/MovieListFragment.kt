@@ -1,34 +1,28 @@
-package com.vakifbank.WatchWise.ui.fragment
+package com.vakifbank.WatchWise.ui.fragment.movielist
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.vakifbank.WatchWise.R
+import com.vakifbank.WatchWise.base.BaseFragment
 import com.vakifbank.WatchWise.databinding.FragmentMovieListBinding
 import com.vakifbank.WatchWise.domain.model.Movie
-import com.vakifbank.WatchWise.domain.model.MovieDetail
-import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsUseCase
-import com.vakifbank.WatchWise.ui.fragment.movielist.MovieListViewModel
 import com.vakifbank.WatchWise.ui.adapter.MovieAdapter
 import com.vakifbank.WatchWise.ui.adapter.MovieListType
 import com.vakifbank.WatchWise.ui.adapter.SearchMovieAdapter
-import com.vakifbank.WatchWise.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MovieListFragment : BaseFragment() {
@@ -37,9 +31,6 @@ class MovieListFragment : BaseFragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MovieListViewModel by viewModels()
-
-    @Inject
-    lateinit var getMovieDetailsUseCase: GetMovieDetailsUseCase
 
     private lateinit var popularMovieAdapter: MovieAdapter
     private lateinit var topRatedMovieAdapter: MovieAdapter
@@ -68,9 +59,18 @@ class MovieListFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (isSearchMode) {
+                clearSearchAndSwitchToNormal()
+            } else {
+                requireActivity().finish()
+            }
+        }
+
         setupRecyclerViews()
         setupSearchSection()
         setupAuthButton()
+        setupSeeMoreButtons()
         setupFavoriteButton(binding.favoriteFab)
         setupObservers()
         viewModel.loadAllMovies()
@@ -81,6 +81,10 @@ class MovieListFragment : BaseFragment() {
             popularMovieList.clear()
             popularMovieList.addAll(movies)
             popularMovieAdapter.notifyDataSetChanged()
+
+            if (movies.isNotEmpty()) {
+                showScrollHint()
+            }
         }
 
         viewModel.topRatedMovies.observe(viewLifecycleOwner) { movies ->
@@ -238,16 +242,52 @@ class MovieListFragment : BaseFragment() {
             return
         }
 
-        lifecycleScope.launch {
-            try {
-                val movieDetail = getMovieDetailsUseCase(movie.id)
-                val bundle = Bundle().apply {
-                    putParcelable("movie_detail_data", movieDetail)
-                }
-                findNavController().navigate(R.id.action_MovieListFragment_to_movieDetailFragment, bundle)
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Film detayları yüklenemedi", Toast.LENGTH_SHORT).show()
+        viewModel.loadMovieDetailsForNavigation(movie.id) { movieDetail ->
+            val bundle = Bundle().apply {
+                putParcelable("movie_detail_data", movieDetail)
             }
+            findNavController().navigate(
+                R.id.action_MovieListFragment_to_movieDetailFragment,
+                bundle
+            )
+        }
+    }
+
+    private fun showScrollHint() {
+        binding.populerRecyclerView.post {
+            if (_binding == null || !isAdded) return@post
+            binding.populerRecyclerView.smoothScrollBy(250, 0)
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (_binding != null && isAdded) {
+                    binding.populerRecyclerView.smoothScrollBy(-250, 0)
+                }
+            }, 1000)
+        }
+    }
+
+    private fun setupSeeMoreButtons() {
+        binding.seeMore.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString("category_type", "popular")
+                putString("category_title", "Popüler Filmler")
+            }
+            findNavController().navigate(R.id.action_MovieListFragment_to_seeMoreFragment, bundle)
+        }
+
+        binding.seeMore2.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString("category_type", "top_rated")
+                putString("category_title", "En İyi Filmler")
+            }
+            findNavController().navigate(R.id.action_MovieListFragment_to_seeMoreFragment, bundle)
+        }
+
+        binding.seeMore3.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString("category_type", "upcoming")
+                putString("category_title", "Yakında Gelecek Filmler")
+            }
+            findNavController().navigate(R.id.action_MovieListFragment_to_seeMoreFragment, bundle)
         }
     }
 

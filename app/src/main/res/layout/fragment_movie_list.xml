@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -65,6 +64,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
+
                     <ImageView
                         android:layout_width="60dp"
                         android:layout_height="60dp"
@@ -80,7 +80,6 @@
 
                         app:tint="@color/white"
                         android:contentDescription="Çıkış Yap" />
-
 
 
                 </LinearLayout>
@@ -255,7 +254,7 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="@id/topRatedText"
                             app:layout_constraintBottom_toBottomOf="@id/topRatedText"
-                            android:clickable="true"/>
+                            android:clickable="true" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -315,7 +314,7 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="@id/upcomingText"
                             app:layout_constraintBottom_toBottomOf="@id/upcomingText"
-                            android:clickable="true"/>
+                            android:clickable="true" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -356,7 +355,6 @@
         app:backgroundTint="@color/primary_purple"
         app:tint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-       />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

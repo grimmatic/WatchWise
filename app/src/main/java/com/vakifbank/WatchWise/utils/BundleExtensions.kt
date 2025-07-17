@@ -1,4 +1,3 @@
-
 package com.vakifbank.WatchWise.utils
 
 import android.os.Build

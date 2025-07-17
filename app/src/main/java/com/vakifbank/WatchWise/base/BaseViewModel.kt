@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-open class BaseViewModel  : ViewModel() {
+open class BaseViewModel : ViewModel() {
     protected val state = MutableStateFlow<UIState>(UIState.Init)
     val mState: StateFlow<UIState> get() = state
 
@@ -24,6 +24,7 @@ open class BaseViewModel  : ViewModel() {
         state.value = UIState.Error(message)
     }
 }
+
 sealed class UIState {
     object Init : UIState()
     data class IsLoading(val isLoading: Boolean) : UIState()

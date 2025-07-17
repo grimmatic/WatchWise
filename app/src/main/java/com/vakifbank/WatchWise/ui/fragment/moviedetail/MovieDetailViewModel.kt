@@ -5,9 +5,22 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vakifbank.WatchWise.domain.model.Movie
+import com.vakifbank.WatchWise.domain.model.MovieDetail
 import com.vakifbank.WatchWise.domain.model.MovieRatingSummary
 import com.vakifbank.WatchWise.domain.model.MovieReview
-import com.vakifbank.WatchWise.domain.usecase.*
+import com.vakifbank.WatchWise.domain.model.MovieVideosResponse
+import com.vakifbank.WatchWise.domain.usecase.AddReviewUseCase
+import com.vakifbank.WatchWise.domain.usecase.AddToFavoritesUseCase
+import com.vakifbank.WatchWise.domain.usecase.DeleteReviewUseCase
+import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsInEnglishUseCase
+import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsUseCase
+import com.vakifbank.WatchWise.domain.usecase.GetMovieRatingSummaryUseCase
+import com.vakifbank.WatchWise.domain.usecase.GetMovieReviewsUseCase
+import com.vakifbank.WatchWise.domain.usecase.GetMovieVideosUseCase
+import com.vakifbank.WatchWise.domain.usecase.GetUserReviewUseCase
+import com.vakifbank.WatchWise.domain.usecase.IsMovieFavoriteUseCase
+import com.vakifbank.WatchWise.domain.usecase.RemoveFromFavoritesUseCase
+import com.vakifbank.WatchWise.domain.usecase.UpdateReviewUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +35,10 @@ class MovieDetailViewModel @Inject constructor(
     private val getUserReviewUseCase: GetUserReviewUseCase,
     private val getMovieReviewsUseCase: GetMovieReviewsUseCase,
     private val getMovieRatingSummaryUseCase: GetMovieRatingSummaryUseCase,
-    private val deleteReviewUseCase: DeleteReviewUseCase
+    private val deleteReviewUseCase: DeleteReviewUseCase,
+    private val getMovieDetailsInEnglishUseCase: GetMovieDetailsInEnglishUseCase,
+    private val getMovieVideosUseCase: GetMovieVideosUseCase,
+    private val getMovieDetailsUseCase: GetMovieDetailsUseCase
 ) : ViewModel() {
 
     private val _isFavorite = MutableLiveData<Boolean>()
@@ -48,6 +64,15 @@ class MovieDetailViewModel @Inject constructor(
 
     private val _reviewResult = MutableLiveData<Boolean>()
     val reviewResult: LiveData<Boolean> = _reviewResult
+
+    private val _englishDescription = MutableLiveData<String?>()
+    val englishDescription: LiveData<String?> = _englishDescription
+
+    private val _movieVideos = MutableLiveData<MovieVideosResponse?>()
+    val movieVideos: LiveData<MovieVideosResponse?> = _movieVideos
+
+    private val _movieDetail = MutableLiveData<MovieDetail?>()
+    val movieDetail: LiveData<MovieDetail?> = _movieDetail
 
     fun checkIfFavorite(movieId: Int) {
         viewModelScope.launch {
@@ -201,10 +226,36 @@ class MovieDetailViewModel @Inject constructor(
         }
     }
 
+    fun loadMovieVideos(movieId: Int) {
+        viewModelScope.launch {
+            try {
+                val videos = getMovieVideosUseCase(movieId)
+                _movieVideos.value = videos
+            } catch (e: Exception) {
+                _error.value = e.message
+                _movieVideos.value = null
+            }
+        }
+    }
+
+    fun loadMovieDetails(movieId: Int) {
+        viewModelScope.launch {
+            try {
+                val detail = getMovieDetailsUseCase(movieId)
+                _movieDetail.value = detail
+            } catch (e: Exception) {
+                _error.value = e.message
+            }
+        }
+    }
+
+
     fun loadMovieData(movieId: Int) {
         checkIfFavorite(movieId)
         loadUserReview(movieId)
         loadMovieReviews(movieId)
         loadRatingSummary(movieId)
+        loadMovieVideos(movieId)
+        loadMovieDetails(movieId)
     }
 }

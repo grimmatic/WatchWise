@@ -1,4 +1,4 @@
-package com.vakifbank.WatchWise.ui.fragment
+package com.vakifbank.WatchWise.ui.fragment.seemore
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,20 +10,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vakifbank.WatchWise.R
+import com.vakifbank.WatchWise.base.BaseFragment
 import com.vakifbank.WatchWise.databinding.FragmentSeeMoreBinding
 import com.vakifbank.WatchWise.domain.model.Movie
-import com.vakifbank.WatchWise.domain.model.MovieDetail
-import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsUseCase
-import com.vakifbank.WatchWise.ui.fragment.seemore.SeeMoreViewModel
 import com.vakifbank.WatchWise.ui.adapter.SearchMovieAdapter
-import com.vakifbank.WatchWise.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import javax.inject.Inject
 
 enum class MovieCategory {
     POPULAR, TOP_RATED, UPCOMING
@@ -37,9 +28,6 @@ class SeeMoreFragment : BaseFragment() {
 
     private val viewModel: SeeMoreViewModel by viewModels()
 
-    @Inject
-    lateinit var getMovieDetailsUseCase: GetMovieDetailsUseCase
-
     private lateinit var searchMovieAdapter: SearchMovieAdapter
     private val movieList = mutableListOf<Movie>()
 
@@ -49,7 +37,7 @@ class SeeMoreFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let { bundle ->
-            categoryType = when(bundle.getString("category_type")) {
+            categoryType = when (bundle.getString("category_type")) {
                 "popular" -> MovieCategory.POPULAR
                 "top_rated" -> MovieCategory.TOP_RATED
                 "upcoming" -> MovieCategory.UPCOMING
@@ -137,16 +125,11 @@ class SeeMoreFragment : BaseFragment() {
             return
         }
 
-        lifecycleScope.launch {
-            try {
-                val movieDetail = getMovieDetailsUseCase(movie.id)
-                val bundle = Bundle().apply {
-                    putParcelable("movie_detail_data", movieDetail)
-                }
-                findNavController().navigate(R.id.action_seeMoreFragment_to_movieDetailFragment, bundle)
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Film detayları yüklenemedi", Toast.LENGTH_SHORT).show()
+        viewModel.loadMovieDetailsForNavigation(movie.id) { movieDetail ->
+            val bundle = Bundle().apply {
+                putParcelable("movie_detail_data", movieDetail)
             }
+            findNavController().navigate(R.id.action_seeMoreFragment_to_movieDetailFragment, bundle)
         }
     }
 

@@ -1,4 +1,4 @@
-package com.vakifbank.WatchWise.ui.fragment
+package com.vakifbank.WatchWise.ui.fragment.favorite
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,17 +13,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.databinding.FragmentFavoriteBinding
 import com.vakifbank.WatchWise.domain.model.Movie
-import com.vakifbank.WatchWise.domain.model.MovieDetail
-import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsUseCase
-import com.vakifbank.WatchWise.ui.fragment.favorite.FavoriteViewModel
 import com.vakifbank.WatchWise.ui.adapter.SearchMovieAdapter
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class FavoriteFragment : Fragment() {
@@ -32,9 +24,6 @@ class FavoriteFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: FavoriteViewModel by viewModels()
-
-    @Inject
-    lateinit var getMovieDetailsUseCase: GetMovieDetailsUseCase
 
     private lateinit var auth: FirebaseAuth
     private lateinit var favoriteMovieAdapter: SearchMovieAdapter
@@ -81,7 +70,8 @@ class FavoriteFragment : Fragment() {
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 showEmptyState("Favori filmler yüklenirken bir hata oluştu.")
-                Toast.makeText(requireContext(), "Favori filmler yüklenemedi", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Favori filmler yüklenemedi", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -133,16 +123,14 @@ class FavoriteFragment : Fragment() {
             return
         }
 
-        lifecycleScope.launch {
-            try {
-                val movieDetail = getMovieDetailsUseCase(movie.id)
-                val bundle = Bundle().apply {
-                    putParcelable("movie_detail_data", movieDetail)
-                }
-                findNavController().navigate(R.id.action_favoriteFragment_to_movieDetailFragment, bundle)
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Film detayları yüklenemedi", Toast.LENGTH_SHORT).show()
+        viewModel.loadMovieDetailsForNavigation(movie.id) { movieDetail ->
+            val bundle = Bundle().apply {
+                putParcelable("movie_detail_data", movieDetail)
             }
+            findNavController().navigate(
+                R.id.action_favoriteFragment_to_movieDetailFragment,
+                bundle
+            )
         }
     }
 

@@ -1,4 +1,4 @@
-package com.vakifbank.WatchWise.ui.fragment
+package com.vakifbank.WatchWise.ui.fragment.moviedetail
 
 import android.content.Intent
 import android.os.Bundle
@@ -15,23 +15,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.vakifbank.WatchWise.R
+import com.vakifbank.WatchWise.base.BaseFragment
 import com.vakifbank.WatchWise.databinding.FragmentMovieDetailBinding
 import com.vakifbank.WatchWise.domain.model.Movie
 import com.vakifbank.WatchWise.domain.model.MovieDetail
-import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsUseCase
-import com.vakifbank.WatchWise.ui.fragment.moviedetail.MovieDetailViewModel
 import com.vakifbank.WatchWise.ui.adapter.ReviewAdapter
-import com.vakifbank.WatchWise.base.BaseFragment
 import com.vakifbank.WatchWise.utils.parcelable
 import com.vakifbank.WatchWise.utils.toRatingString
 import dagger.hilt.android.AndroidEntryPoint
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import javax.inject.Inject
-import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsInEnglishUseCase
-import com.vakifbank.WatchWise.domain.usecase.GetMovieVideosUseCase
-
 
 @AndroidEntryPoint
 class MovieDetailFragment : BaseFragment() {
@@ -40,11 +31,6 @@ class MovieDetailFragment : BaseFragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MovieDetailViewModel by viewModels()
-
-    @Inject
-    lateinit var getMovieDetailsUseCase: GetMovieDetailsUseCase
-    lateinit var getMovieDetailsInEnglishUseCase: GetMovieDetailsInEnglishUseCase
-    lateinit var getMovieVideosUseCase: GetMovieVideosUseCase
 
     private var movieDetail: MovieDetail? = null
     private var trailerKey: String? = null
@@ -78,7 +64,6 @@ class MovieDetailFragment : BaseFragment() {
 
         movieDetail?.id?.let { movieId ->
             viewModel.loadMovieData(movieId)
-            loadMovieTrailer(movieId)
         }
     }
 
@@ -114,6 +99,13 @@ class MovieDetailFragment : BaseFragment() {
                 binding.ratingSummaryLayout.visibility = View.GONE
             }
         }
+        viewModel.englishDescription.observe(viewLifecycleOwner) { description ->
+            if (!description.isNullOrEmpty() && movieDetail?.description.isNullOrEmpty()) {
+                binding.movieDescriptionTextView.text = description
+                binding.movieDescriptionTextView.visibility = View.VISIBLE
+            }
+        }
+
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.submitReviewButton.isEnabled = !isLoading
@@ -153,6 +145,26 @@ class MovieDetailFragment : BaseFragment() {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
         }
+
+        viewModel.englishDescription.observe(viewLifecycleOwner) { description ->
+            description?.takeIf { it.isNotEmpty() }?.let {
+                binding.movieDescriptionTextView.text = it
+                binding.movieDescriptionTextView.visibility = View.VISIBLE
+            } ?: run {
+                binding.movieDescriptionTextView.visibility = View.GONE
+            }
+        }
+
+        viewModel.movieVideos.observe(viewLifecycleOwner) { videosResponse ->
+            videosResponse?.results?.find { video ->
+                video.type == "Trailer" && video.site == "YouTube"
+            }?.let { trailer ->
+                trailerKey = trailer.key
+                binding.trailerButton.visibility = View.VISIBLE
+            } ?: run {
+                binding.trailerButton.visibility = View.GONE
+            }
+        }
     }
 
     private fun initUI() {
@@ -175,7 +187,11 @@ class MovieDetailFragment : BaseFragment() {
             if (auth.currentUser != null) {
                 findNavController().navigate(R.id.action_movieDetailFragment_to_favoriteFragment)
             } else {
-                Toast.makeText(requireContext(), "Favorileri görmek için giriş yapmalısınız", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Favorileri görmek için giriş yapmalısınız",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -236,7 +252,11 @@ class MovieDetailFragment : BaseFragment() {
     private fun handleReviewSubmission() {
         val currentUser = auth.currentUser
         if (currentUser == null) {
-            Toast.makeText(requireContext(), "Yorum yapmak için giriş yapmalısınız", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "Yorum yapmak için giriş yapmalısınız",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
 
@@ -279,7 +299,11 @@ class MovieDetailFragment : BaseFragment() {
     private fun handleFavoriteClick() {
         val currentUser = auth.currentUser
         if (currentUser == null) {
-            Toast.makeText(requireContext(), "Favorilere eklemek için giriş yapmalısınız", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "Favorilere eklemek için giriş yapmalısınız",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
 
@@ -344,15 +368,9 @@ class MovieDetailFragment : BaseFragment() {
         }
     }
 
-    private fun loadMovieTrailer(movieId: Int?) {
-        movieId?.let { id ->
-            val call = getMovieVideosUseCase(id) // Bu use case yerine video use case kullanılmalı
-            // Trailer loading logic burada implement edilecek
-        }
-    }
-
     private fun setupMovieDetails() {
-        binding.movieDescriptionTextView.movementMethod = android.text.method.ScrollingMovementMethod()
+        binding.movieDescriptionTextView.movementMethod =
+            android.text.method.ScrollingMovementMethod()
 
         binding.movieDescriptionTextView.setOnTouchListener { view, event ->
             view.parent.requestDisallowInterceptTouchEvent(true)
@@ -376,7 +394,9 @@ class MovieDetailFragment : BaseFragment() {
                 binding.movieDescriptionTextView.text = description
                 binding.movieDescriptionTextView.visibility = View.VISIBLE
             } ?: run {
-                loadEnglishDescription(movie.id)
+                movie.id?.let { movieId ->
+                    viewModel.loadEnglishDescription(movieId)
+                }
             }
 
             movie.language?.takeIf { it.isNotEmpty() }?.let { language ->
@@ -405,12 +425,6 @@ class MovieDetailFragment : BaseFragment() {
         }
     }
 
-    private fun loadEnglishDescription(movieId: Int?) {
-        movieId?.let { id ->
-            viewModel.loadEnglishDescription(id)
-        }
-    }
-
     private fun loadMoviePoster(posterPath: String?) {
         val posterUrl = "https://image.tmdb.org/t/p/w500$posterPath"
         Glide.with(requireContext())
@@ -430,12 +444,14 @@ class MovieDetailFragment : BaseFragment() {
                     genreLayoutGone(genreLinear2)
                     genreLayoutGone(genreLinear3)
                 }
+
                 1 -> {
                     genreTextView1.text = genreList[0].name
                     genreLayoutVisible(genreLinear1)
                     genreLayoutGone(genreLinear2)
                     genreLayoutGone(genreLinear3)
                 }
+
                 2 -> {
                     genreTextView1.text = genreList[0].name
                     genreTextView2.text = genreList[1].name
@@ -443,6 +459,7 @@ class MovieDetailFragment : BaseFragment() {
                     genreLayoutVisible(genreLinear2)
                     genreLayoutGone(genreLinear3)
                 }
+
                 else -> {
                     genreTextView1.text = genreList[0].name
                     genreTextView2.text = genreList[1].name
