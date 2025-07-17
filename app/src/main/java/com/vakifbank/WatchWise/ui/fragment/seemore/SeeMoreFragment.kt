@@ -4,37 +4,45 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vakifbank.WatchWise.R
-import com.vakifbank.WatchWise.data.repository.MoviesRepository
 import com.vakifbank.WatchWise.databinding.FragmentSeeMoreBinding
-import com.vakifbank.WatchWise.domain.model.GetMoviesResponse
 import com.vakifbank.WatchWise.domain.model.Movie
 import com.vakifbank.WatchWise.domain.model.MovieDetail
+import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsUseCase
+import com.vakifbank.WatchWise.ui.fragment.seemore.SeeMoreViewModel
 import com.vakifbank.WatchWise.ui.adapter.SearchMovieAdapter
+import com.vakifbank.WatchWise.base.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
 enum class MovieCategory {
     POPULAR, TOP_RATED, UPCOMING
 }
 
+@AndroidEntryPoint
 class SeeMoreFragment : BaseFragment() {
 
     private var _binding: FragmentSeeMoreBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: SeeMoreViewModel by viewModels()
+
+    @Inject
+    lateinit var getMovieDetailsUseCase: GetMovieDetailsUseCase
 
     private lateinit var searchMovieAdapter: SearchMovieAdapter
     private val movieList = mutableListOf<Movie>()
 
     private var categoryType: MovieCategory = MovieCategory.POPULAR
     private var categoryTitle: String = ""
-    private var currentPage = 1
-    private var totalPages = 1
-    private var isLoading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +55,6 @@ class SeeMoreFragment : BaseFragment() {
             }
             categoryTitle = bundle.getString("category_title") ?: "Filmler"
         }
-
     }
 
     override fun onCreateView(
@@ -64,7 +71,27 @@ class SeeMoreFragment : BaseFragment() {
         setupUI()
         setupRecyclerView()
         setupFavoriteButton(binding.favoriteFab)
-        loadMovies(currentPage)
+        setupObservers()
+
+        viewModel.setCategoryType(categoryType)
+        viewModel.loadMovies(1)
+    }
+
+    private fun setupObservers() {
+        viewModel.movies.observe(viewLifecycleOwner) { movies ->
+            movieList.clear()
+            movieList.addAll(movies)
+            searchMovieAdapter.notifyDataSetChanged()
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setupUI() {
@@ -91,12 +118,11 @@ class SeeMoreFragment : BaseFragment() {
                     val visibleItemCount = layoutManager.childCount
                     val totalItemCount = layoutManager.itemCount
                     val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-                   // println("visibleItemCount: $visibleItemCount, totalItemCount: $totalItemCount, firstVisibleItemPosition: $firstVisibleItemPosition")
 
-                    // sayfanın sonuna (20 filme) yaklaştığında yeni sayfa yükle
-                    if (!isLoading && currentPage < totalPages) {
+                    // Sayfanın sonuna yaklaştığında yeni sayfa yükle
+                    if (!viewModel.isLoading.value!! && viewModel.hasMorePages.value!!) {
                         if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount - 5) {
-                            loadMovies(currentPage + 1)
+                            viewModel.loadNextPage()
                         }
                     }
                 }
@@ -104,51 +130,12 @@ class SeeMoreFragment : BaseFragment() {
         }
     }
 
-    private fun loadMovies(page: Int) {
-        if (isLoading) return
-        isLoading = true
-
-        val call = when(categoryType) {
-            MovieCategory.POPULAR -> MoviesRepository.getPopularMovies(page)
-            MovieCategory.TOP_RATED -> MoviesRepository.getTopRatedMovies(page)
-            MovieCategory.UPCOMING -> MoviesRepository.getUpcomingMovies(page)
-        }
-
-        call.enqueue(object : Callback<GetMoviesResponse> {
-            override fun onResponse(call: Call<GetMoviesResponse>, response: Response<GetMoviesResponse>) {
-                isLoading = false
-
-                if (response.isSuccessful) {
-                    val moviesResponse = response.body()
-                    moviesResponse?.let {
-                        totalPages = it.totalPages ?: 1
-                        it.movies?.let { movies ->
-                            if (page == 1) {
-                                movieList.clear()
-                            }
-                            movieList.addAll(movies)
-                            currentPage = page
-                            searchMovieAdapter.notifyDataSetChanged()
-
-                            if (currentPage < 1 && currentPage < totalPages) {
-                                loadMovies(currentPage + 1)
-                            }
-                        }
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<GetMoviesResponse>, t: Throwable) {
-            }
-        })
-    }
-
     private fun onMovieClick(movie: Movie) {
         if (movie.id == null || movie.id == -1) {
             return
         }
 
-        val call = MoviesRepository.getMovieDetails(movie.id)
+        val call = getMovieDetailsUseCase(movie.id)
         call.enqueue(object : Callback<MovieDetail> {
             override fun onResponse(call: Call<MovieDetail>, response: Response<MovieDetail>) {
                 if (response.isSuccessful) {
@@ -161,6 +148,7 @@ class SeeMoreFragment : BaseFragment() {
                 }
             }
             override fun onFailure(call: Call<MovieDetail>, t: Throwable) {
+                Toast.makeText(requireContext(), "Film detayları yüklenemedi", Toast.LENGTH_SHORT).show()
             }
         })
     }

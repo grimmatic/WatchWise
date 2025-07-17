@@ -1,20 +1,26 @@
+// data/repository/FavoriteRepositoryImpl.kt
 package com.vakifbank.WatchWise.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.vakifbank.WatchWise.domain.model.Movie
+import com.vakifbank.WatchWise.domain.repository.FavoriteRepository
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object FavoriteRepository {
-    private val auth = FirebaseAuth.getInstance()
-    private val firestore = FirebaseFirestore.getInstance()
+@Singleton
+class FavoriteRepositoryImpl @Inject constructor(
+    private val auth: FirebaseAuth,
+    private val firestore: FirebaseFirestore
+) : FavoriteRepository {
 
     private fun getUserFavoritesCollection() =
         firestore.collection("users")
             .document(auth.currentUser?.uid ?: "")
             .collection("favorites")
 
-    suspend fun addToFavorites(movie: Movie): Boolean {
+    override suspend fun addToFavorites(movie: Movie): Boolean {
         return try {
             val currentUser = auth.currentUser
             if (currentUser != null && movie.id != null) {
@@ -35,13 +41,12 @@ object FavoriteRepository {
                 true
             } else
                 false
-
         } catch (e: Exception) {
             false
         }
     }
 
-    suspend fun removeFromFavorites(movieId: Int): Boolean {
+    override suspend fun removeFromFavorites(movieId: Int): Boolean {
         return try {
             val currentUser = auth.currentUser
             if (currentUser != null) {
@@ -52,13 +57,12 @@ object FavoriteRepository {
                 true
             } else
                 false
-
         } catch (e: Exception) {
             false
         }
     }
 
-    suspend fun getFavoriteMovies(): List<Movie> {
+    override suspend fun getFavoriteMovies(): List<Movie> {
         return try {
             val currentUser = auth.currentUser
             if (currentUser != null) {
@@ -88,18 +92,16 @@ object FavoriteRepository {
         }
     }
 
-    suspend fun isMovieFavorite(movieId: Int): Boolean {
+    override suspend fun isMovieFavorite(movieId: Int): Boolean {
         return try {
             val currentUser = auth.currentUser
-
             currentUser?.let {
                 val document = getUserFavoritesCollection()
                     .document(movieId.toString())
                     .get()
                     .await()
                 document.exists()
-            }?:false
-
+            } ?: false
         } catch (e: Exception) {
             false
         }

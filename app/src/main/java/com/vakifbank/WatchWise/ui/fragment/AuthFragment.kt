@@ -10,12 +10,18 @@ import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.vakifbank.WatchWise.R
 import com.vakifbank.WatchWise.databinding.FragmentAuthBinding
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AuthFragment : Fragment() {
+
     private var _binding: FragmentAuthBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var auth: FirebaseAuth
+    @Inject
+    lateinit var auth: FirebaseAuth
+
     private var isLoginMode = true
 
     override fun onCreateView(
@@ -29,8 +35,6 @@ class AuthFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        auth = FirebaseAuth.getInstance()
 
         // Kullanıcı zaten giriş yapmışsa direkt ana sayfaya yönlendir
         if (auth.currentUser != null) {
@@ -72,7 +76,6 @@ class AuthFragment : Fragment() {
             navigateToHome()
         }
     }
-
 
     private fun loginUser() {
         val email = binding.emailEditText.text.toString().trim()
@@ -136,9 +139,11 @@ class AuthFragment : Fragment() {
         if (password.length < 6) {
             binding.passwordInputLayout.error = "Şifre en az 6 karakter olmalı"
             binding.passwordInputLayout.setErrorIconDrawable(null)
-
             return false
         }
+
+        binding.emailInputLayout.error = null
+        binding.passwordInputLayout.error = null
 
         return true
     }
