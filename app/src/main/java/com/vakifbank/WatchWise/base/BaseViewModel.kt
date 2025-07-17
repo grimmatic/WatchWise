@@ -5,23 +5,27 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 open class BaseViewModel : ViewModel() {
-    protected val state = MutableStateFlow<UIState>(UIState.Init)
-    val mState: StateFlow<UIState> get() = state
+    protected val _state = MutableStateFlow<UIState>(UIState.Init)
+    val state: StateFlow<UIState> get() = _state
 
     protected fun showLoading() {
-        state.value = UIState.IsLoading(true)
+        _state.value = UIState.IsLoading(true)
     }
 
     protected fun hideLoading() {
-        state.value = UIState.IsLoading(false)
+        _state.value = UIState.IsLoading(false)
     }
 
     protected fun showToast(message: String) {
-        state.value = UIState.ShowToast(message)
+        _state.value = UIState.ShowToast(message)
     }
 
     protected fun showErrorMessage(message: String) {
-        state.value = UIState.Error(message)
+        _state.value = UIState.Error(message)
+    }
+
+    fun resetState() {
+        _state.value = UIState.Init
     }
 }
 
@@ -29,7 +33,5 @@ sealed class UIState {
     object Init : UIState()
     data class IsLoading(val isLoading: Boolean) : UIState()
     data class ShowToast(val message: String) : UIState()
-
-    //data class Success(val Entity: WrappedResponse<T>) : UIState()
     data class Error(val rawResponse: String) : UIState()
 }
