@@ -5,7 +5,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 open class BaseViewModel : ViewModel() {
-    protected val _state = MutableStateFlow<UIState>(UIState.Init)
+    //Livedata vs Flow?
+    protected val _state: MutableStateFlow<UIState> = MutableStateFlow<UIState>(UIState.Init)
     val state: StateFlow<UIState> get() = _state
 
     protected fun showLoading() {

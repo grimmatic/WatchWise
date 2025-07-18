@@ -1,12 +1,16 @@
-// data/repository/ReviewRepositoryImpl.kt
 package com.vakifbank.WatchWise.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.vakifbank.WatchWise.domain.model.MovieRatingSummary
 import com.vakifbank.WatchWise.domain.model.MovieReview
 import com.vakifbank.WatchWise.domain.repository.ReviewRepository
+import com.vakifbank.WatchWise.utils.Constant
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,12 +21,24 @@ class ReviewRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : ReviewRepository {
 
-    private fun getMovieReviewsCollection(movieId: Int) =
+    private val REVIEW_ID: String = Constant.ReviewConstants.REVIEW_ID
+    private val REVIEWS: String = Constant.ReviewConstants.REVIEWS
+    private val RATING: String = Constant.ReviewConstants.RATING
+    private val COMMENT: String = Constant.ReviewConstants.COMMENT
+    private val TIMESTAMP: String = Constant.ReviewConstants.TIMESTAMP
+    private val MOVIE_ID: String = Constant.ReviewConstants.MOVIE_ID
+    private val USER_ID: String = Constant.ReviewConstants.USER_ID
+    private val USER_EMAIL: String = Constant.ReviewConstants.USER_EMAIL
+    private val AVERAGE_RATING: String = Constant.ReviewConstants.AVERAGE_RATING
+    private val TOTAL_REVIEWS: String = Constant.ReviewConstants.TOTAL_REVIEWS
+    private val RATING_DISTRIBUTION: String = Constant.ReviewConstants.RATING_DISTRIBUTION
+
+    private fun getMovieReviewsCollection(movieId: Int): CollectionReference =
         firestore.collection("movie_reviews")
             .document(movieId.toString())
-            .collection("reviews")
+            .collection(REVIEWS)
 
-    private fun getMovieRatingSummaryDocument(movieId: Int) =
+    private fun getMovieRatingSummaryDocument(movieId: Int): DocumentReference =
         firestore.collection("movie_ratings")
             .document(movieId.toString())
 
@@ -44,13 +60,13 @@ class ReviewRepositoryImpl @Inject constructor(
                 )
 
                 val reviewData = hashMapOf(
-                    "reviewId" to review.reviewId,
-                    "movieId" to review.movieId,
-                    "userId" to review.userId,
-                    "userEmail" to review.userEmail,
-                    "rating" to review.rating,
-                    "comment" to review.comment,
-                    "timestamp" to review.timestamp
+                    REVIEW_ID to review.reviewId,
+                    MOVIE_ID to review.movieId,
+                    USER_ID to review.userId,
+                    USER_EMAIL to review.userEmail,
+                    RATING to review.rating,
+                    COMMENT to review.comment,
+                    TIMESTAMP to review.timestamp
                 )
 
                 getMovieReviewsCollection(movieId)
@@ -69,15 +85,15 @@ class ReviewRepositoryImpl @Inject constructor(
 
     override suspend fun updateReview(movieId: Int, rating: Float, comment: String): Boolean {
         return try {
-            val currentUser = auth.currentUser
+            val currentUser: FirebaseUser? = auth.currentUser
             if (currentUser != null) {
                 val reviewId = "${currentUser.uid}_${movieId}"
-                val timestamp = System.currentTimeMillis()
+                val timestamp: Long = System.currentTimeMillis()
 
                 val updateData = hashMapOf(
-                    "rating" to rating,
-                    "comment" to comment,
-                    "timestamp" to timestamp
+                    RATING to rating,
+                    COMMENT to comment,
+                    TIMESTAMP to timestamp
                 )
 
                 getMovieReviewsCollection(movieId)
@@ -96,23 +112,23 @@ class ReviewRepositoryImpl @Inject constructor(
 
     override suspend fun getUserReview(movieId: Int): MovieReview? {
         return try {
-            val currentUser = auth.currentUser
+            val currentUser: FirebaseUser? = auth.currentUser
             if (currentUser != null) {
                 val reviewId = "${currentUser.uid}_${movieId}"
-                val document = getMovieReviewsCollection(movieId)
+                val document: DocumentSnapshot = getMovieReviewsCollection(movieId)
                     .document(reviewId)
                     .get()
                     .await()
 
                 if (document.exists()) {
                     MovieReview(
-                        reviewId = document.getString("reviewId"),
-                        movieId = document.getLong("movieId")?.toInt(),
-                        userId = document.getString("userId"),
-                        userEmail = document.getString("userEmail"),
-                        rating = document.getDouble("rating")?.toFloat(),
-                        comment = document.getString("comment"),
-                        timestamp = document.getLong("timestamp")
+                        reviewId = document.getString(REVIEW_ID),
+                        movieId = document.getLong(MOVIE_ID)?.toInt(),
+                        userId = document.getString(USER_ID),
+                        userEmail = document.getString(USER_EMAIL),
+                        rating = document.getDouble(RATING)?.toFloat(),
+                        comment = document.getString(COMMENT),
+                        timestamp = document.getLong(TIMESTAMP)
                     )
                 } else
                     null
@@ -126,20 +142,20 @@ class ReviewRepositoryImpl @Inject constructor(
     override suspend fun getMovieReviews(movieId: Int): List<MovieReview> {
         return try {
             val querySnapshot = getMovieReviewsCollection(movieId)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .orderBy(TIMESTAMP, Query.Direction.DESCENDING)
                 .get()
                 .await()
 
             querySnapshot.documents.mapNotNull { document ->
                 try {
                     MovieReview(
-                        reviewId = document.getString("reviewId"),
-                        movieId = document.getLong("movieId")?.toInt(),
-                        userId = document.getString("userId"),
-                        userEmail = document.getString("userEmail"),
-                        rating = document.getDouble("rating")?.toFloat(),
-                        comment = document.getString("comment"),
-                        timestamp = document.getLong("timestamp")
+                        reviewId = document.getString(REVIEW_ID),
+                        movieId = document.getLong(MOVIE_ID)?.toInt(),
+                        userId = document.getString(USER_ID),
+                        userEmail = document.getString(USER_EMAIL),
+                        rating = document.getDouble(RATING)?.toFloat(),
+                        comment = document.getString(COMMENT),
+                        timestamp = document.getLong(TIMESTAMP)
                     )
                 } catch (e: Exception) {
                     null
@@ -152,16 +168,16 @@ class ReviewRepositoryImpl @Inject constructor(
 
     override suspend fun getMovieRatingSummary(movieId: Int): MovieRatingSummary? {
         return try {
-            val document = getMovieRatingSummaryDocument(movieId)
+            val document: DocumentSnapshot = getMovieRatingSummaryDocument(movieId)
                 .get()
                 .await()
 
             if (document.exists()) {
                 MovieRatingSummary(
-                    movieId = document.getLong("movieId")?.toInt(),
-                    averageRating = document.getDouble("averageRating")?.toFloat(),
-                    totalReviews = document.getLong("totalReviews")?.toInt(),
-                    ratingDistribution = document.get("ratingDistribution") as? Map<Int, Int>
+                    movieId = document.getLong(MOVIE_ID)?.toInt(),
+                    averageRating = document.getDouble(AVERAGE_RATING)?.toFloat(),
+                    totalReviews = document.getLong(TOTAL_REVIEWS)?.toInt(),
+                    ratingDistribution = document.get(RATING_DISTRIBUTION) as? Map<Int, Int>
                 )
             } else
                 null
@@ -172,7 +188,7 @@ class ReviewRepositoryImpl @Inject constructor(
 
     private suspend fun updateRatingSummary(movieId: Int) {
         try {
-            val reviews = getMovieReviews(movieId)
+            val reviews: List<MovieReview> = getMovieReviews(movieId)
 
             if (reviews.isNotEmpty()) {
                 val ratings = reviews.mapNotNull { it.rating }
@@ -190,10 +206,10 @@ class ReviewRepositoryImpl @Inject constructor(
                 }
 
                 val summaryData = hashMapOf(
-                    "movieId" to movieId,
-                    "averageRating" to averageRating,
-                    "totalReviews" to totalReviews,
-                    "ratingDistribution" to ratingDistribution
+                    MOVIE_ID to movieId,
+                    AVERAGE_RATING to averageRating,
+                    TOTAL_REVIEWS to totalReviews,
+                    RATING_DISTRIBUTION to ratingDistribution
                 )
 
                 getMovieRatingSummaryDocument(movieId)
@@ -206,7 +222,7 @@ class ReviewRepositoryImpl @Inject constructor(
 
     override suspend fun deleteReview(movieId: Int): Boolean {
         return try {
-            val currentUser = auth.currentUser
+            val currentUser: FirebaseUser? = auth.currentUser
             if (currentUser != null) {
                 val reviewId = "${currentUser.uid}_${movieId}"
 
