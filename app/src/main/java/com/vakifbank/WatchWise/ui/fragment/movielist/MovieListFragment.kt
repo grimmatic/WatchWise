@@ -44,6 +44,7 @@ class MovieListFragment : BaseFragment() {
 
     private var isSearchMode = false
     private var lastSearchQuery = ""
+    private val savedSearchResults = mutableListOf<Movie>()
 
     private lateinit var auth: FirebaseAuth
 
@@ -51,6 +52,7 @@ class MovieListFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
+
     ): View {
         _binding = FragmentMovieListBinding.inflate(inflater, container, false)
         auth = FirebaseAuth.getInstance()
@@ -73,7 +75,28 @@ class MovieListFragment : BaseFragment() {
         setupSeeMoreButtons()
         setupFavoriteButton(binding.favoriteFab)
         setupObservers()
-        viewModel.loadAllMovies()
+        //viewModel.loadAllMovies()
+        if (isSearchMode) {
+            restoreSearchState()
+        } else {
+            viewModel.loadAllMovies()
+        }
+    }
+
+    private fun restoreSearchState() {
+        binding.searchEditText.setText(lastSearchQuery)
+        binding.searchEditText.setSelection(lastSearchQuery.length)
+        switchToSearchMode()
+
+        if (savedSearchResults.isNotEmpty()) {
+            searchMovieList.clear()
+            searchMovieList.addAll(savedSearchResults)
+            searchMovieAdapter.updateMovies(savedSearchResults)
+        }
+
+        if (lastSearchQuery.isNotEmpty()) {
+            viewModel.searchMovies(lastSearchQuery)
+        }
     }
 
     private fun setupObservers() {
@@ -82,7 +105,7 @@ class MovieListFragment : BaseFragment() {
             popularMovieList.addAll(movies)
             popularMovieAdapter.notifyDataSetChanged()
 
-            if (movies.isNotEmpty()) {
+            if (movies.isNotEmpty() && !isSearchMode) {
                 showScrollHint()
             }
         }
@@ -100,6 +123,13 @@ class MovieListFragment : BaseFragment() {
         }
 
         viewModel.searchResults.observe(viewLifecycleOwner) { movies ->
+            searchMovieList.clear()
+            searchMovieList.addAll(movies)
+
+            savedSearchResults.clear()
+            savedSearchResults.addAll(movies)
+
+            searchMovieAdapter.updateMovies(movies)
             searchMovieAdapter.updateMovies(movies)
         }
 
@@ -186,6 +216,8 @@ class MovieListFragment : BaseFragment() {
         binding.searchResultsRecyclerView.visibility = View.GONE
         binding.backButton.visibility = View.GONE
         searchMovieAdapter.clearMovies()
+        savedSearchResults.clear()
+
     }
 
     private fun clearSearchAndSwitchToNormal() {
