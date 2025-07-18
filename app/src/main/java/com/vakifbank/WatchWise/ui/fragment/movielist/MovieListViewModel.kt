@@ -2,7 +2,6 @@ package com.vakifbank.WatchWise.ui.fragment.movielist
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vakifbank.WatchWise.base.BaseViewModel
 import com.vakifbank.WatchWise.domain.model.Movie

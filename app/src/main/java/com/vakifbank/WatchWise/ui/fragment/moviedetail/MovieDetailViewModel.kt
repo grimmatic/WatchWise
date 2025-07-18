@@ -71,6 +71,7 @@ class MovieDetailViewModel @Inject constructor(
     private val _movieVideos = MutableLiveData<MovieVideosResponse?>()
     val movieVideos: LiveData<MovieVideosResponse?> = _movieVideos
 
+    // livedata kullanımı
     private val _movieDetail = MutableLiveData<MovieDetail?>()
     val movieDetail: LiveData<MovieDetail?> = _movieDetail
 

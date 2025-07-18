@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 abstract class BaseFragment : Fragment() {
 
     protected fun setupFavoriteButton(favoriteButton: FloatingActionButton?) {
-        val auth = FirebaseAuth.getInstance()
+        val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
         favoriteButton?.let { fab ->
             if (auth.currentUser != null) {
@@ -31,18 +31,21 @@ abstract class BaseFragment : Fragment() {
 
     protected fun observeBaseState(viewModel: BaseViewModel) {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.state.collect { state ->
+            viewLifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
+                viewModel.state.collect { state: UIState ->
                     when (state) {
                         is UIState.Init -> {
                         }
+
                         is UIState.IsLoading -> {
                             handleLoadingState(state.isLoading)
                         }
+
                         is UIState.ShowToast -> {
                             showToast(state.message)
                             viewModel.resetState()
                         }
+
                         is UIState.Error -> {
                             showErrorMessage(state.rawResponse)
                             viewModel.resetState()
