@@ -32,7 +32,6 @@ class MovieDetailFragment : BaseFragment() {
 
     private val viewModel: MovieDetailViewModel by viewModels()
 
-    private var movieDetail: MovieDetail? = null
     private var trailerKey: String? = null
     private lateinit var auth: FirebaseAuth
     private lateinit var reviewAdapter: ReviewAdapter
@@ -43,8 +42,12 @@ class MovieDetailFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = FirebaseAuth.getInstance()
+
         arguments?.let { bundle ->
-            movieDetail = bundle.parcelable<MovieDetail>("movie_detail_data")
+            val movieDetail = bundle.parcelable<MovieDetail>("movie_detail_data")
+            movieDetail?.let {
+                viewModel.setMovieDetail(it)
+            }
         }
     }
 
@@ -60,10 +63,14 @@ class MovieDetailFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         initUI()
         setupObservers()
-        setupMovieDetails()
 
-        movieDetail?.id?.let { movieId ->
-            viewModel.loadMovieData(movieId)
+        viewModel.movieDetail.observe(viewLifecycleOwner) { movieDetail ->
+            movieDetail?.let {
+                setupMovieDetailsUI(it)
+                it.id?.let { movieId ->
+                    viewModel.loadMovieData(movieId)
+                }
+            }
         }
     }
 
@@ -99,13 +106,17 @@ class MovieDetailFragment : BaseFragment() {
                 binding.ratingSummaryLayout.visibility = View.GONE
             }
         }
+
         viewModel.englishDescription.observe(viewLifecycleOwner) { description ->
-            if (!description.isNullOrEmpty() && movieDetail?.description.isNullOrEmpty()) {
-                binding.movieDescriptionTextView.text = description
-                binding.movieDescriptionTextView.visibility = View.VISIBLE
+            if (!description.isNullOrEmpty()) {
+                viewModel.movieDetail.value?.let { movieDetail ->
+                    if (movieDetail.description.isNullOrEmpty()) {
+                        binding.movieDescriptionTextView.text = description
+                        binding.movieDescriptionTextView.visibility = View.VISIBLE
+                    }
+                }
             }
         }
-
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.submitReviewButton.isEnabled = !isLoading
@@ -143,15 +154,6 @@ class MovieDetailFragment : BaseFragment() {
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        viewModel.englishDescription.observe(viewLifecycleOwner) { description ->
-            description?.takeIf { it.isNotEmpty() }?.let {
-                binding.movieDescriptionTextView.text = it
-                binding.movieDescriptionTextView.visibility = View.VISIBLE
-            } ?: run {
-                binding.movieDescriptionTextView.visibility = View.GONE
             }
         }
 
@@ -268,7 +270,7 @@ class MovieDetailFragment : BaseFragment() {
         val comment = binding.commentEditText.text.toString().trim()
         currentComment = comment
 
-        val movieId = movieDetail?.id
+        val movieId = viewModel.movieDetail.value?.id
         if (movieId == null) {
             Toast.makeText(requireContext(), "Film bilgisi bulunamadı", Toast.LENGTH_SHORT).show()
             return
@@ -282,7 +284,7 @@ class MovieDetailFragment : BaseFragment() {
     }
 
     private fun handleReviewDeletion() {
-        val movieId = movieDetail?.id ?: return
+        val movieId = viewModel.movieDetail.value?.id ?: return
         viewModel.deleteReview(movieId)
     }
 
@@ -307,7 +309,7 @@ class MovieDetailFragment : BaseFragment() {
             return
         }
 
-        movieDetail?.let { detail ->
+        viewModel.movieDetail.value?.let { detail ->
             val isFavorite = viewModel.isFavorite.value ?: false
 
             if (isFavorite) {
@@ -368,7 +370,7 @@ class MovieDetailFragment : BaseFragment() {
         }
     }
 
-    private fun setupMovieDetails() {
+    private fun setupMovieDetailsUI(movieDetail: MovieDetail) {
         binding.movieDescriptionTextView.movementMethod =
             android.text.method.ScrollingMovementMethod()
 
@@ -382,47 +384,45 @@ class MovieDetailFragment : BaseFragment() {
             false
         }
 
-        movieDetail?.let { movie ->
-            movie.title?.takeIf { it.isNotEmpty() }?.let { title ->
-                binding.movieTitleTextView.text = title
-                binding.movieTitleTextView.visibility = View.VISIBLE
-            } ?: run {
-                binding.movieTitleTextView.visibility = View.GONE
-            }
-
-            movie.description?.takeIf { it.isNotEmpty() }?.let { description ->
-                binding.movieDescriptionTextView.text = description
-                binding.movieDescriptionTextView.visibility = View.VISIBLE
-            } ?: run {
-                movie.id?.let { movieId ->
-                    viewModel.loadEnglishDescription(movieId)
-                }
-            }
-
-            movie.language?.takeIf { it.isNotEmpty() }?.let { language ->
-                binding.languageTextView.text = language
-                binding.languageTextView.visibility = View.VISIBLE
-            } ?: run {
-                binding.languageTextView.visibility = View.GONE
-            }
-
-            movie.rating?.let { rating ->
-                binding.ratingTextView.text = rating.toRatingString()
-                binding.ratingTextView.visibility = View.VISIBLE
-            } ?: run {
-                binding.ratingTextView.visibility = View.GONE
-            }
-
-            movie.releaseDate?.takeIf { it.isNotEmpty() }?.let { releaseDate ->
-                binding.releaseDateTextView.text = releaseDate.substringBefore("-")
-                binding.releaseDateTextView.visibility = View.VISIBLE
-            } ?: run {
-                binding.releaseDateTextView.visibility = View.GONE
-            }
-
-            loadMoviePoster(posterPath = movie.poster)
-            setupGenreViews(movie.genres)
+        movieDetail.title?.takeIf { it.isNotEmpty() }?.let { title ->
+            binding.movieTitleTextView.text = title
+            binding.movieTitleTextView.visibility = View.VISIBLE
+        } ?: run {
+            binding.movieTitleTextView.visibility = View.GONE
         }
+
+        movieDetail.description?.takeIf { it.isNotEmpty() }?.let { description ->
+            binding.movieDescriptionTextView.text = description
+            binding.movieDescriptionTextView.visibility = View.VISIBLE
+        } ?: run {
+            movieDetail.id?.let { movieId ->
+                viewModel.loadEnglishDescription(movieId)
+            }
+        }
+
+        movieDetail.language?.takeIf { it.isNotEmpty() }?.let { language ->
+            binding.languageTextView.text = language
+            binding.languageTextView.visibility = View.VISIBLE
+        } ?: run {
+            binding.languageTextView.visibility = View.GONE
+        }
+
+        movieDetail.rating?.let { rating ->
+            binding.ratingTextView.text = rating.toRatingString()
+            binding.ratingTextView.visibility = View.VISIBLE
+        } ?: run {
+            binding.ratingTextView.visibility = View.GONE
+        }
+
+        movieDetail.releaseDate?.takeIf { it.isNotEmpty() }?.let { releaseDate ->
+            binding.releaseDateTextView.text = releaseDate.substringBefore("-")
+            binding.releaseDateTextView.visibility = View.VISIBLE
+        } ?: run {
+            binding.releaseDateTextView.visibility = View.GONE
+        }
+
+        loadMoviePoster(posterPath = movieDetail.poster)
+        setupGenreViews(movieDetail.genres)
     }
 
     private fun loadMoviePoster(posterPath: String?) {
@@ -481,7 +481,7 @@ class MovieDetailFragment : BaseFragment() {
     }
 
     private fun navigateBack() {
-        findNavController().navigateUp()
+        findNavController().popBackStack()
     }
 
     override fun onDestroyView() {

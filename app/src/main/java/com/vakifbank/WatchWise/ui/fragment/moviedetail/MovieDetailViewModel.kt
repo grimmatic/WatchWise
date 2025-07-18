@@ -13,7 +13,6 @@ import com.vakifbank.WatchWise.domain.usecase.AddReviewUseCase
 import com.vakifbank.WatchWise.domain.usecase.AddToFavoritesUseCase
 import com.vakifbank.WatchWise.domain.usecase.DeleteReviewUseCase
 import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsInEnglishUseCase
-import com.vakifbank.WatchWise.domain.usecase.GetMovieDetailsUseCase
 import com.vakifbank.WatchWise.domain.usecase.GetMovieRatingSummaryUseCase
 import com.vakifbank.WatchWise.domain.usecase.GetMovieReviewsUseCase
 import com.vakifbank.WatchWise.domain.usecase.GetMovieVideosUseCase
@@ -38,7 +37,6 @@ class MovieDetailViewModel @Inject constructor(
     private val deleteReviewUseCase: DeleteReviewUseCase,
     private val getMovieDetailsInEnglishUseCase: GetMovieDetailsInEnglishUseCase,
     private val getMovieVideosUseCase: GetMovieVideosUseCase,
-    private val getMovieDetailsUseCase: GetMovieDetailsUseCase
 ) : ViewModel() {
 
     private val _isFavorite = MutableLiveData<Boolean>()
@@ -71,9 +69,21 @@ class MovieDetailViewModel @Inject constructor(
     private val _movieVideos = MutableLiveData<MovieVideosResponse?>()
     val movieVideos: LiveData<MovieVideosResponse?> = _movieVideos
 
-    // livedata kullanımı
     private val _movieDetail = MutableLiveData<MovieDetail?>()
     val movieDetail: LiveData<MovieDetail?> = _movieDetail
+
+
+    fun loadMovieData(movieId: Int) {
+        checkIfFavorite(movieId)
+        loadUserReview(movieId)
+        loadMovieReviews(movieId)
+        loadRatingSummary(movieId)
+        loadMovieVideos(movieId)
+    }
+
+    fun setMovieDetail(movieDetail: MovieDetail) {
+        _movieDetail.value = movieDetail
+    }
 
     fun checkIfFavorite(movieId: Int) {
         viewModelScope.launch {
@@ -239,24 +249,5 @@ class MovieDetailViewModel @Inject constructor(
         }
     }
 
-    fun loadMovieDetails(movieId: Int) {
-        viewModelScope.launch {
-            try {
-                val detail = getMovieDetailsUseCase(movieId)
-                _movieDetail.value = detail
-            } catch (e: Exception) {
-                _error.value = e.message
-            }
-        }
-    }
 
-
-    fun loadMovieData(movieId: Int) {
-        checkIfFavorite(movieId)
-        loadUserReview(movieId)
-        loadMovieReviews(movieId)
-        loadRatingSummary(movieId)
-        loadMovieVideos(movieId)
-        loadMovieDetails(movieId)
-    }
 }
