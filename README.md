@@ -188,7 +188,7 @@ For any questions or suggestions, please feel free to reach out:
 
 - **Email**: sevbansaricicek@gmail.com
 - **GitHub**: [@grimmatic](https://github.com/grimmatic)
-- **LinkedIn**: [Your LinkedIn](https://linkedin.com/in/sevbansaricicek)
+- **LinkedIn**: [sevbansaricicek](https://linkedin.com/in/sevbansaricicek)
 
 ---
 
