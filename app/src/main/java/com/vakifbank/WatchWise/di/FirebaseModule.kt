@@ -8,7 +8,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-//Singelton ne yapar  ?
 @Module
 @InstallIn(SingletonComponent::class)
 object FirebaseModule {
