@@ -76,7 +76,7 @@ WatchWise uses [The Movie Database (TMDb) API](https://developers.themoviedb.org
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/watchwise.git
+   git clone https://github.com/grimmatic/watchwise.git
    cd watchwise
    ```
 
